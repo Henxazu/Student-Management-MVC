@@ -1,58 +1,71 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Student List</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    </head>
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+        <!DOCTYPE html>
+        <html>
 
-    <body>
-        <div class="container">
-            <h1>Student Management System</h1>
-            <div class="toolbar">
-                <a href="student?action=new" class="btn btn-primary">Add New Student</a>
-            </div>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Student List</title>
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+        </head>
 
-            <table class="table">
-                <thead>
-                    <tr>
+        <body>
+            <div class="container">
+                <h1>Student Management System</h1>
 
-                    <th>ID</th>
-                    <th>Student Code</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Major</th>
-                    <th>Actions</th>
+                <div class="toolbar">
+                    <form action="student?action=search" method="get" style="display:inline-block;">
+                        <input type="text" name="query" placeholder="Search student..." value="${param.query}" required>
+                        <button type="submit" class="btn btn-sm">Search</button>
+                        <a href="student?action=list" class="btn btn-sm btn-secondary">Clear</a>
+                    </form>
+                </div>
 
-                    </tr>
-                </thead>
+                <div class="toolbar">
+                    <a href="student?action=new" class="btn btn-primary">Add New Student</a>
+                </div>
 
-                <tbody>
-                    <c:forEach items="${students}" var="student">
+                <table class="table">
+                    <thead>
                         <tr>
 
-                        <td>${student.id}</td>
-                        <td>${student.studentCode}</td>
-                        <td>${student.fullName}</td>
-                        <td>${student.email}</td>
-                        <td>${student.major}</td>
-                        <td>
-                        <a href="student?action=view&id=${student.id}" class="btn btn-sm">View</a>
-                        <a href="student?action=edit&id=${student.id}" class="btn btn-sm">Edit</a>
-                        <a href="student?action=delete&id=${student.id}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
-                        </td>
+                            <th>ID</th>
+                            <th>Student Code</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Major</th>
+                            <th>Actions</th>
 
                         </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-            
-            <c:if test="${empty students}">
-                <p class="empty-message">No students found.</p>
-            </c:if>
-        </div>
-    </body>
-</html>
+                    </thead>
+
+                    <tbody>
+                        <c:forEach items="${students}" var="student">
+                            <tr>
+
+                                <td>${student.id}</td>
+                                <td>${student.studentCode}</td>
+                                <td>${student.fullName}</td>
+                                <td>${student.email}</td>
+                                <td>${student.major}</td>
+                                <td>
+                                    <a href="student?action=view&id=${student.id}" class="btn btn-sm">View</a>
+                                    <a href="student?action=edit&id=${student.id}" class="btn btn-sm">Edit</a>
+                                    <a href="student?action=confirmDelete&id=${student.id}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="<c: url value='/WEB-INF/views/confirmationPage.jsp'/>">Delete</a>
+                                </td>
+
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+
+                <c:if test="${empty students}">
+                    <p class="empty-message">No students found.</p>
+                </c:if>
+            </div>
+        </body>
+
+        </html>
