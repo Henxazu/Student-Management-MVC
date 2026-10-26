@@ -17,6 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class StudentController extends HttpServlet {
     private StudentDAO studentDAO;
 
+    // Default page size
+    private static final int DEFAULT_PAGE_SIZE = 5;
+
     // initialization
     @Override
     public void init() {
@@ -37,6 +40,7 @@ public class StudentController extends HttpServlet {
         try {
             switch (action) {
                 case "list":
+                case "search":
                     listStudents(rq, rp);
                     break;
                 case "view":
@@ -50,9 +54,6 @@ public class StudentController extends HttpServlet {
                     break;
                 case "edit":
                     showEditForm(rq, rp);
-                    break;
-                case "search":
-                    showSearch(rq, rp);
                     break;
                 case "confirmDelete":
                     showConfirmDelete(rq, rp);
@@ -91,22 +92,112 @@ public class StudentController extends HttpServlet {
                 .forward(rq, rp);
     }
 
-    // Show students on searching
-    private void showSearch(HttpServletRequest rq, HttpServletResponse rp)
-            throws SQLException, ServletException, IOException {
-        String query = rq.getParameter("query");
-        List<Student> students = studentDAO.searchStudent(query);
-        rq.setAttribute("students", students);
-        rq.getRequestDispatcher("/WEB-INF/views/student-list.jsp")
-                .forward(rq, rp);
-    }
-
-    // List all student
+    // Combined Search + Pagination + Sort
     private void listStudents(HttpServletRequest rq, HttpServletResponse rp)
             throws SQLException, ServletException, IOException {
 
-        List<Student> students = studentDAO.getAllStudent();
+        // 1. Search keyword (support both 'search' and 'query' parameters)
+        String search = rq.getParameter("search");
+        if (search == null) {
+            search = rq.getParameter("query");
+        }
+        if (search != null) {
+            search = search.trim();
+        }
+        if (search != null && search.isEmpty()) {
+            search = null;
+        }
+
+        // 2. Sorting column and order
+        String sortParam = rq.getParameter("sort");
+        String sort = "student_code";
+        if (sortParam != null) {
+            switch (sortParam.toLowerCase().trim()) {
+                case "name":
+                case "full_name":
+                case "fullname":
+                    sort = "full_name";
+                    break;
+                case "email":
+                    sort = "email";
+                    break;
+                case "major":
+                    sort = "major";
+                    break;
+                case "id":
+                    sort = "id";
+                    break;
+                case "student_code":
+                case "studentcode":
+                default:
+                    sort = "student_code";
+                    break;
+            }
+        }
+
+        String order = rq.getParameter("order");
+        if (order == null || (!"asc".equalsIgnoreCase(order) && !"desc".equalsIgnoreCase(order))) {
+            order = "asc";
+        } else {
+            order = order.toLowerCase().trim();
+        }
+
+        // 3. Page size (default 5 students per page)
+        int pageSize = DEFAULT_PAGE_SIZE;
+        String pageSizeParam = rq.getParameter("pageSize");
+        if (pageSizeParam != null && !pageSizeParam.trim().isEmpty()) {
+            try {
+                int ps = Integer.parseInt(pageSizeParam.trim());
+                if (ps > 0) {
+                    pageSize = ps;
+                }
+            } catch (NumberFormatException ignored) {
+                pageSize = DEFAULT_PAGE_SIZE;
+            }
+        }
+
+        // 4. Calculate total records and total pages
+        int totalStudents = studentDAO.getTotalStudents(search);
+        int totalPages = (int) Math.ceil((double) totalStudents / pageSize);
+        if (totalPages < 1) {
+            totalPages = 1;
+        }
+
+        // 5. Page number & edge cases (page < 1, page > maxPage)
+        int page = 1;
+        String pageParam = rq.getParameter("page");
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                page = Integer.parseInt(pageParam.trim());
+            } catch (NumberFormatException ignored) {
+                page = 1;
+            }
+        }
+
+        // Edge case: page < 1
+        if (page < 1) {
+            page = 1;
+        }
+        // Edge case: page > maxPage
+        if (page > totalPages) {
+            page = totalPages;
+        }
+
+        // 6. Fetch paginated, sorted, and filtered students
+        List<Student> students = studentDAO.getStudents(page, pageSize, sort, order, search);
+
+        // 7. Set request attributes
         rq.setAttribute("students", students);
+        rq.setAttribute("currentPage", page);
+        rq.setAttribute("totalPages", totalPages);
+        rq.setAttribute("totalStudents", totalStudents);
+        rq.setAttribute("pageSize", pageSize);
+        rq.setAttribute("sort", sort);
+        rq.setAttribute("order", order);
+        rq.setAttribute("reverseOrder", "asc".equalsIgnoreCase(order) ? "desc" : "asc");
+        rq.setAttribute("search", search != null ? search : "");
+        rq.setAttribute("query", search != null ? search : "");
+
         rq.getRequestDispatcher("/WEB-INF/views/student-list.jsp")
                 .forward(rq, rp);
     }
@@ -124,23 +215,26 @@ public class StudentController extends HttpServlet {
 
     // Show New Form
     private void showNewForm(HttpServletRequest rq, HttpServletResponse rp)
-            throws SQLException, ServletException, IOException {
-        rq.getRequestDispatcher("/WEB-INF/views/student-new-form.jsp")
+            throws ServletException, IOException {
+        rq.getRequestDispatcher("/WEB-INF/views/student-form.jsp")
                 .forward(rq, rp);
     }
 
     // Show Edit Form
     private void showEditForm(HttpServletRequest rq, HttpServletResponse rp)
             throws SQLException, ServletException, IOException {
-        rq.getRequestDispatcher("/WEB-INF/views/student-edit-form.jsp")
+        int id = Integer.parseInt(rq.getParameter("id"));
+        Student student = studentDAO.getStudentById(id);
+        rq.setAttribute("student", student);
+        rq.getRequestDispatcher("/WEB-INF/views/student-form.jsp")
                 .forward(rq, rp);
     }
 
     // Insert student
     private void insertStudent(HttpServletRequest rq, HttpServletResponse rp)
-            throws SQLException, ServletException, IOException {
+            throws SQLException, IOException {
         Student s = new Student();
-        s.setFullName(rq.getParameter("name"));
+        s.setFullName(rq.getParameter("full_name"));
         s.setEmail(rq.getParameter("email"));
         s.setStudentCode(rq.getParameter("student_code"));
         s.setMajor(rq.getParameter("major"));
@@ -151,15 +245,15 @@ public class StudentController extends HttpServlet {
 
     // Update
     private void updateStudent(HttpServletRequest rq, HttpServletResponse rp)
-            throws SQLException, ServletException, IOException {
-        String student_code = rq.getParameter("student_code");
-        String student_fullName = rq.getParameter("name");
-        String student_email = rq.getParameter("email");
-        String student_major = rq.getParameter("major");
-        int student_id = Integer.parseInt(rq.getParameter("id"));
+            throws SQLException, IOException {
+        String studentCode = rq.getParameter("student_code");
+        String fullName = rq.getParameter("full_name") != null ? rq.getParameter("full_name") : rq.getParameter("name");
+        String email = rq.getParameter("email");
+        String major = rq.getParameter("major");
+        int id = Integer.parseInt(rq.getParameter("id"));
 
-        Student s = new Student(student_code, student_fullName, student_email, student_major);
-        s.setId(student_id);
+        Student s = new Student(studentCode, fullName, email, major);
+        s.setId(id);
 
         studentDAO.updateStudent(s);
 
@@ -168,7 +262,7 @@ public class StudentController extends HttpServlet {
 
     // Delete
     private void deleteStudent(HttpServletRequest rq, HttpServletResponse rp)
-            throws SQLException, ServletException, IOException {
+            throws SQLException, IOException {
         int id = Integer.parseInt(rq.getParameter("id"));
         studentDAO.deleteStudent(id);
 

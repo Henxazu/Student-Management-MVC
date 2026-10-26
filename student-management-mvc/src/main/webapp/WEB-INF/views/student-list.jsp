@@ -53,8 +53,7 @@
                                     <a href="student?action=view&id=${student.id}" class="btn btn-sm">View</a>
                                     <a href="student?action=edit&id=${student.id}" class="btn btn-sm">Edit</a>
                                     <a href="student?action=confirmDelete&id=${student.id}"
-                                        class="btn btn-sm btn-danger"
-                                        onclick="<c: url value='/WEB-INF/views/confirmationPage.jsp'/>">Delete</a>
+                                        class="btn btn-sm btn-danger">Delete</a>
                                 </td>
 
                             </tr>
@@ -67,5 +66,7 @@
                 </c:if>
             </div>
         </body>
+
+        <script src="${pageContext.request.contextPath}/js/pageSizeControl.js"></script>
 
         </html>

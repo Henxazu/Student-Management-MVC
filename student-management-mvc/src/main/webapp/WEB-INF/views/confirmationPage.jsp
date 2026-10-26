@@ -17,8 +17,8 @@
                 <div class="card">
                     <h2>Student Information</h2>
                     <p><strong>ID:</strong> ${student.id}</p>
-                    <p><strong>Student Code:</strong> ${student.student_code}</p>
-                    <p><strong>Full Name:</strong> ${student.full_name}</p>
+                    <p><strong>Student Code:</strong> ${student.studentCode}</p>
+                    <p><strong>Full Name:</strong> ${student.fullName}</p>
                     <p><strong>Email:</strong> ${student.email}</p>
                     <p><strong>Major:</strong> ${student.major}</p>
                 </div>
@@ -31,8 +31,7 @@
                 <!-- Buttons -->
                 <div class="form-actions">
                     <a href="student?action=delete&id=${student.id}" class="btn btn-danger">Delete</a>
-                    <a href="student?action=list" class="btn btn-secondary"
-                        onclick="<c:url value='/WEB-INF/views/student-list.jsp'/>">Cancel</a>
+                    <a href="student?action=list" class="btn btn-secondary">Cancel</a>
                 </div>
             </div>
         </body>
