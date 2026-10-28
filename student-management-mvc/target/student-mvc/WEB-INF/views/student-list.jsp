@@ -24,6 +24,7 @@
 
                 <div class="toolbar">
                     <a href="student?action=new" class="btn btn-primary">Add New Student</a>
+                    <a href="student?action=export&format=csv" class="btn btn-success">Export to CSV</a>
                 </div>
 
                 <table class="table">
@@ -60,6 +61,8 @@
                         </c:forEach>
                     </tbody>
                 </table>
+
+
 
                 <c:if test="${empty students}">
                     <p class="empty-message">No students found.</p>

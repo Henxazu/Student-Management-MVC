@@ -50,6 +50,12 @@ background-color: #dc3545;
 .btn-danger:hover {
 background-color: #c82333;
 }
+.btn-success {
+background-color: #28a745;
+}
+.btn-success:hover {
+background-color: #218838;
+}
 .btn-sm {
 padding: 5px 10px;
 font-size: 0.875rem;

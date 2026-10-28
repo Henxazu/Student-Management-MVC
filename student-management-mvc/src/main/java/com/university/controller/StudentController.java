@@ -1,6 +1,7 @@
 package com.university.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -39,7 +40,12 @@ public class StudentController extends HttpServlet {
 
         try {
             switch (action) {
+                case "export":
+                    exportCsv(rq, rp);
+                    break;
                 case "list":
+                    listStudents(rq, rp);
+                    break;
                 case "search":
                     listStudents(rq, rp);
                     break;
@@ -80,6 +86,54 @@ public class StudentController extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("DB Error", e);
         }
+    }
+
+    // EXPORT TO CSV
+    private void exportCsv(HttpServletRequest rq, HttpServletResponse rp)
+            throws SQLException, IOException, ServletException {
+        String format = rq.getParameter("format");
+        if (format != null && !"csv".equalsIgnoreCase(format)) {
+            listStudents(rq, rp);
+            return;
+        }
+
+        List<Student> students = studentDAO.getAllStudent();
+
+        rp.setContentType("text/csv; charset=UTF-8");
+        rp.setCharacterEncoding("UTF-8");
+        rp.setHeader("Content-Disposition", "attachment; filename=\"students.csv\"");
+        rp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        rp.setHeader("Pragma", "no-cache");
+        rp.setDateHeader("Expires", 0);
+
+        PrintWriter writer = rp.getWriter();
+        // UTF-8 BOM so spreadsheet editors like Excel render UTF-8 characters cleanly
+        writer.write('\ufeff');
+
+        // CSV Header: student_code,full_name,email,major
+        writer.println("student_code,full_name,email,major");
+
+        // CSV Data Rows
+        for (Student s : students) {
+            writer.print(escapeCsv(s.getStudentCode()));
+            writer.print(",");
+            writer.print(escapeCsv(s.getFullName()));
+            writer.print(",");
+            writer.print(escapeCsv(s.getEmail()));
+            writer.print(",");
+            writer.println(escapeCsv(s.getMajor()));
+        }
+        writer.flush();
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null) {
+            return "";
+        }
+        if (value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
     }
 
     // Show confirmation delete

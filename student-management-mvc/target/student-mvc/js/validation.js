@@ -65,11 +65,14 @@ function init() {
     document.getElementById("email").addEventListener("blur", validEmail);
     document.getElementById("major").addEventListener("blur", validMajor);
 
-    document.getElementById("student-form").addEventListener("submit", function (event) {
-        if (!validStudentCode() || !validFullName() || !validEmail() || !validMajor()) {
-            event.preventDefault();
-        }
-    });
+    const form = document.getElementById("student-form");
+    if (form) {
+        form.addEventListener("submit", function (event) {
+            if (!validStudentCode() || !validFullName() || !validEmail() || !validMajor()) {
+                event.preventDefault();
+            }
+        });
+    }
 }
 
-window.addEventListener("load", init);
+window.addEventListener("DOMContentLoaded", init);
