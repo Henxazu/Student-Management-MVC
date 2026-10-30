@@ -111,14 +111,14 @@
 
                             <!-- Actions -->
                             <div class="form-actions" style="justify-content: space-between; margin-top: 32px;">
-                                <a href="student?action=list" class="btn btn-secondary">
+                                <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Back to Student List
                                 </a>
                                 <div style="display: flex; gap: 10px;">
-                                    <a href="student?action=edit&id=${student.id}" class="btn btn-primary">
+                                    <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-primary">
                                         <i class="bi bi-pencil-square"></i> Edit Student
                                     </a>
-                                    <a href="student?action=confirmDelete&id=${student.id}" class="btn btn-danger">
+                                    <a href="${pageContext.request.contextPath}/student?action=confirmDelete&id=${student.id}" class="btn btn-danger">
                                         <i class="bi bi-trash3"></i> Delete
                                     </a>
                                 </div>
@@ -132,7 +132,7 @@
                         <div class="empty-icon"><i class="bi bi-exclamation-triangle"></i></div>
                         <h3 class="empty-title">Student Not Found</h3>
                         <p class="empty-desc">The requested student record does not exist or may have been removed.</p>
-                        <a href="student?action=list" class="btn btn-primary">
+                        <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-primary">
                             <i class="bi bi-arrow-left"></i> Return to Student Directory
                         </a>
                     </div>

@@ -54,7 +54,7 @@
             <div class="toolbar-card">
                 <div class="toolbar-row">
                     <!-- Search Form -->
-                    <form action="student" method="get" class="search-box">
+                    <form action="${pageContext.request.contextPath}/student" method="get" class="search-box">
                         <input type="hidden" name="action" value="list">
                         <input type="hidden" name="sort" value="${sort}">
                         <input type="hidden" name="order" value="${order}">
@@ -63,14 +63,14 @@
                         <input type="text" name="search" placeholder="Search by code, name, email or major..." value="<c:out value='${search}'/>">
                         <button type="submit" class="btn btn-sm btn-primary" style="margin-right:2px;">Search</button>
                         <c:if test="${not empty search}">
-                            <a href="student?action=list&pageSize=${pageSize}&sort=${sort}&order=${order}" class="btn btn-sm btn-secondary" title="Clear Search">
+                            <a href="${pageContext.request.contextPath}/student?action=list&pageSize=${pageSize}&sort=${sort}&order=${order}" class="btn btn-sm btn-secondary" title="Clear Search">
                                 <i class="bi bi-x-lg"></i>
                             </a>
                         </c:if>
                     </form>
 
                     <!-- Page Size Selector -->
-                    <form action="student" method="get" class="pagesize-control">
+                    <form action="${pageContext.request.contextPath}/student" method="get" class="pagesize-control">
                         <input type="hidden" name="action" value="list">
                         <input type="hidden" name="search" value="<c:out value='${search}'/>">
                         <input type="hidden" name="sort" value="${sort}">
@@ -108,7 +108,7 @@
 
             <!-- Table Card -->
             <div class="table-card">
-                <form id="bulkForm" action="student" method="post">
+                <form id="bulkForm" action="${pageContext.request.contextPath}/student" method="post">
                     <input type="hidden" name="action" value="confirmBulkDelete">
 
                     <div class="table-responsive">
@@ -119,7 +119,7 @@
                                         <input type="checkbox" id="selectAll" title="Select All">
                                     </th>
                                     <th>
-                                        <a href="student?action=list&sort=id&order=${sort == 'id' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&sort=id&order=${sort == 'id' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
                                             ID
                                             <span class="sort-indicator ${sort == 'id' ? 'active' : 'inactive'}">
                                                 <i class="bi ${sort == 'id' ? (order == 'desc' ? 'bi-sort-numeric-down-alt' : 'bi-sort-numeric-down') : 'bi-arrow-down-up'}"></i>
@@ -127,7 +127,7 @@
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="student?action=list&sort=student_code&order=${sort == 'student_code' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&sort=student_code&order=${sort == 'student_code' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
                                             Student Code
                                             <span class="sort-indicator ${sort == 'student_code' ? 'active' : 'inactive'}">
                                                 <i class="bi ${sort == 'student_code' ? (order == 'desc' ? 'bi-sort-alpha-down-alt' : 'bi-sort-alpha-down') : 'bi-arrow-down-up'}"></i>
@@ -135,7 +135,7 @@
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="student?action=list&sort=full_name&order=${sort == 'full_name' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&sort=full_name&order=${sort == 'full_name' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
                                             Full Name
                                             <span class="sort-indicator ${sort == 'full_name' ? 'active' : 'inactive'}">
                                                 <i class="bi ${sort == 'full_name' ? (order == 'desc' ? 'bi-sort-alpha-down-alt' : 'bi-sort-alpha-down') : 'bi-arrow-down-up'}"></i>
@@ -143,7 +143,7 @@
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="student?action=list&sort=email&order=${sort == 'email' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&sort=email&order=${sort == 'email' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
                                             Email Address
                                             <span class="sort-indicator ${sort == 'email' ? 'active' : 'inactive'}">
                                                 <i class="bi ${sort == 'email' ? (order == 'desc' ? 'bi-sort-alpha-down-alt' : 'bi-sort-alpha-down') : 'bi-arrow-down-up'}"></i>
@@ -151,7 +151,7 @@
                                         </a>
                                     </th>
                                     <th>
-                                        <a href="student?action=list&sort=major&order=${sort == 'major' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&sort=major&order=${sort == 'major' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
                                             Major
                                             <span class="sort-indicator ${sort == 'major' ? 'active' : 'inactive'}">
                                                 <i class="bi ${sort == 'major' ? (order == 'desc' ? 'bi-sort-alpha-down-alt' : 'bi-sort-alpha-down') : 'bi-arrow-down-up'}"></i>
@@ -171,7 +171,7 @@
                                         <td><span style="color:var(--text-muted); font-size:0.875rem;">#${student.id}</span></td>
                                         <td><strong style="color:var(--primary); font-family:monospace; font-size:0.95rem;">${student.studentCode}</strong></td>
                                         <td>
-                                            <a href="student?action=view&id=${student.id}" style="color:var(--text-primary); text-decoration:none; font-weight:600;">
+                                            <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" style="color:var(--text-primary); text-decoration:none; font-weight:600;">
                                                 ${student.fullName}
                                             </a>
                                         </td>
@@ -201,13 +201,13 @@
                                         </td>
                                         <td style="text-align: right; padding-right: 24px;">
                                             <div class="action-group" style="justify-content: flex-end;">
-                                                <a href="student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Details">
+                                                <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Details">
                                                     <i class="bi bi-eye"></i> View
                                                 </a>
-                                                <a href="student?action=edit&id=${student.id}" class="btn btn-sm btn-secondary" title="Edit Student">
+                                                <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-sm btn-secondary" title="Edit Student">
                                                     <i class="bi bi-pencil-square"></i> Edit
                                                 </a>
-                                                <a href="student?action=confirmDelete&id=${student.id}" class="btn btn-sm btn-danger" title="Delete Student">
+                                                <a href="${pageContext.request.contextPath}/student?action=confirmDelete&id=${student.id}" class="btn btn-sm btn-danger" title="Delete Student">
                                                     <i class="bi bi-trash3"></i> Delete
                                                 </a>
                                             </div>
@@ -236,12 +236,12 @@
                         </p>
                         <c:choose>
                             <c:when test="${not empty search}">
-                                <a href="student?action=list" class="btn btn-secondary">
+                                <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                     <i class="bi bi-arrow-counterclockwise"></i> Clear Filters
                                 </a>
                             </c:when>
                             <c:otherwise>
-                                <a href="student?action=new" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/student?action=new" class="btn btn-primary">
                                     <i class="bi bi-person-plus-fill"></i> Add First Student
                                 </a>
                             </c:otherwise>
@@ -263,7 +263,7 @@
                             <li>
                                 <c:choose>
                                     <c:when test="${currentPage > 1}">
-                                        <a href="student?action=list&page=1&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="First Page">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&page=1&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="First Page">
                                             <i class="bi bi-chevron-double-left"></i>
                                         </a>
                                     </c:when>
@@ -277,7 +277,7 @@
                             <li>
                                 <c:choose>
                                     <c:when test="${currentPage > 1}">
-                                        <a href="student?action=list&page=${currentPage - 1}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="Previous Page">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&page=${currentPage - 1}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="Previous Page">
                                             <i class="bi bi-chevron-left"></i>
                                         </a>
                                     </c:when>
@@ -298,7 +298,7 @@
                                             <span class="page-link active">${p}</span>
                                         </c:when>
                                         <c:otherwise>
-                                            <a href="student?action=list&page=${p}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link">
+                                            <a href="${pageContext.request.contextPath}/student?action=list&page=${p}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link">
                                                 ${p}
                                             </a>
                                         </c:otherwise>
@@ -310,7 +310,7 @@
                             <li>
                                 <c:choose>
                                     <c:when test="${currentPage < totalPages}">
-                                        <a href="student?action=list&page=${currentPage + 1}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="Next Page">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&page=${currentPage + 1}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="Next Page">
                                             <i class="bi bi-chevron-right"></i>
                                         </a>
                                     </c:when>
@@ -324,7 +324,7 @@
                             <li>
                                 <c:choose>
                                     <c:when test="${currentPage < totalPages}">
-                                        <a href="student?action=list&page=${totalPages}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="Last Page">
+                                        <a href="${pageContext.request.contextPath}/student?action=list&page=${totalPages}&pageSize=${pageSize}&sort=${sort}&order=${order}&search=<c:out value='${search}'/>" class="page-link" title="Last Page">
                                             <i class="bi bi-chevron-double-right"></i>
                                         </a>
                                     </c:when>

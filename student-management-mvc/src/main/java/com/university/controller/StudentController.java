@@ -243,7 +243,7 @@ public class StudentController extends HttpServlet {
         }
 
         if (idParams == null || idParams.length == 0) {
-            rp.sendRedirect("student?action=list");
+            rp.sendRedirect(rq.getContextPath() + "/student?action=list");
             return;
         }
 
@@ -258,13 +258,13 @@ public class StudentController extends HttpServlet {
         }
 
         if (ids.isEmpty()) {
-            rp.sendRedirect("student?action=list");
+            rp.sendRedirect(rq.getContextPath() + "/student?action=list");
             return;
         }
 
         List<Student> students = studentDAO.getStudentsByIds(ids);
         if (students.isEmpty()) {
-            rp.sendRedirect("student?action=list");
+            rp.sendRedirect(rq.getContextPath() + "/student?action=list");
             return;
         }
 
@@ -421,7 +421,7 @@ public class StudentController extends HttpServlet {
         s.setMajor(rq.getParameter("major"));
 
         studentDAO.insertStudent(s);
-        rp.sendRedirect("student?action=list");
+        rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
     // Update
@@ -438,7 +438,7 @@ public class StudentController extends HttpServlet {
 
         studentDAO.updateStudent(s);
 
-        rp.sendRedirect("student?action=list");
+        rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
     // Delete single student
@@ -447,7 +447,7 @@ public class StudentController extends HttpServlet {
         int id = Integer.parseInt(rq.getParameter("id"));
         studentDAO.deleteStudent(id);
 
-        rp.sendRedirect("student?action=list");
+        rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
     // Bulk delete selected students
@@ -473,6 +473,6 @@ public class StudentController extends HttpServlet {
             }
         }
 
-        rp.sendRedirect("student?action=list");
+        rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 }

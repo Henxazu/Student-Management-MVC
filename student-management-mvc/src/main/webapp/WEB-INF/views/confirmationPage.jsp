@@ -81,13 +81,13 @@
                         </div>
                     </div>
 
-                    <form action="student" method="post">
+                    <form action="${pageContext.request.contextPath}/student" method="post">
                         <input type="hidden" name="action" value="bulkDelete">
                         <c:forEach items="${students}" var="s">
                             <input type="hidden" name="selectedIds" value="${s.id}">
                         </c:forEach>
                         <div class="form-actions" style="justify-content: flex-end;">
-                            <a href="student?action=list" class="btn btn-secondary">
+                            <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                 Cancel
                             </a>
                             <button type="submit" class="btn btn-danger">
@@ -142,10 +142,10 @@
                         </div>
 
                         <div class="form-actions" style="justify-content: flex-end; margin-top: 24px;">
-                            <a href="student?action=list" class="btn btn-secondary">
+                            <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                 Cancel
                             </a>
-                            <a href="student?action=delete&id=${student.id}" class="btn btn-danger">
+                            <a href="${pageContext.request.contextPath}/student?action=delete&id=${student.id}" class="btn btn-danger">
                                 <i class="bi bi-trash3-fill"></i> Confirm &amp; Delete Student
                             </a>
                         </div>
@@ -158,7 +158,7 @@
                         <div class="empty-icon"><i class="bi bi-info-circle"></i></div>
                         <h3 class="empty-title">No Student Selected</h3>
                         <p class="empty-desc">No valid student was selected for deletion.</p>
-                        <a href="student?action=list" class="btn btn-primary">
+                        <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-primary">
                             <i class="bi bi-arrow-left"></i> Return to Student Directory
                         </a>
                     </div>

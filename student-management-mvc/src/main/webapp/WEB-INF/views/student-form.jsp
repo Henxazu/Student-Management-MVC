@@ -37,12 +37,12 @@
                         <i class="bi ${student != null ? 'bi-pencil-square' : 'bi-person-plus-fill'}" style="color:var(--primary);"></i>
                         ${student != null ? 'Edit Student Details' : 'Enroll New Student'}
                     </h2>
-                    <a href="student?action=list" class="btn btn-sm btn-secondary">
+                    <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-sm btn-secondary">
                         <i class="bi bi-arrow-left"></i> Back to List
                     </a>
                 </div>
 
-                <form id="student-form" method="post" action="student" novalidate>
+                <form id="student-form" method="post" action="${pageContext.request.contextPath}/student" novalidate>
                     <input type="hidden" name="action" value="${student != null ? 'update' : 'insert'}">
 
                     <c:if test="${student != null}">
@@ -113,7 +113,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-check-circle-fill"></i> ${student != null ? 'Save Changes' : 'Enroll Student'}
                         </button>
-                        <a href="student?action=list" class="btn btn-secondary">
+                        <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                             Cancel
                         </a>
                     </div>
