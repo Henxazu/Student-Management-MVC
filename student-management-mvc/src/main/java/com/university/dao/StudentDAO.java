@@ -6,6 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.sql.Timestamp;
+import java.time.YearMonth;
 import java.util.List;
 
 import com.university.model.Student;
@@ -13,7 +17,7 @@ import com.university.model.Student;
 public class StudentDAO {
 
     // DB config
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/student_management?useSSL=false";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/student_management?useSSL=false&allowPublicKeyRetrieval=true";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "180706anhph@n";
 
@@ -199,6 +203,33 @@ public class StudentDAO {
         return student;
     }
 
+    // Get students by a list of IDs (used for bulk delete confirmation page)
+    public List<Student> getStudentsByIds(List<Integer> ids) throws SQLException {
+        List<Student> students = new ArrayList<>();
+        if (ids == null || ids.isEmpty()) {
+            return students;
+        }
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM students WHERE id IN (");
+        for (int i = 0; i < ids.size(); i++) {
+            sql.append(i == 0 ? "?" : ", ?");
+        }
+        sql.append(") ORDER BY student_code ASC");
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < ids.size(); i++) {
+                stmt.setInt(i + 1, ids.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    students.add(extractStudentFromResultSet(rs));
+                }
+            }
+        }
+        return students;
+    }
+
     // INSERT
     public boolean insertStudent(Student s) throws SQLException {
         try (Connection conn = getConnection();
@@ -212,12 +243,59 @@ public class StudentDAO {
         }
     }
 
-    // DELETE
+    // DELETE single student
     public boolean deleteStudent(int id) throws SQLException {
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(DELETE_STUDENT)) {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
+        }
+    }
+
+    // BULK DELETE students with database transaction (all-or-none)
+    public boolean deleteStudents(List<Integer> ids) throws SQLException {
+        if (ids == null || ids.isEmpty()) {
+            return false;
+        }
+
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            // Start transaction: disable auto-commit
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmt = conn.prepareStatement(DELETE_STUDENT)) {
+                for (int id : ids) {
+                    stmt.setInt(1, id);
+                    stmt.addBatch();
+                }
+                stmt.executeBatch();
+            }
+
+            // Commit transaction if all batch operations succeed
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            // Rollback transaction to ensure all-or-none integrity
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    e.addSuppressed(rollbackEx);
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException ignored) {
+                }
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
     }
 
@@ -232,6 +310,77 @@ public class StudentDAO {
             stmt.setInt(5, s.getId());
             return stmt.executeUpdate() > 0;
         }
+    }
+
+    // ===================== STATISTICS QUERIES =====================
+
+    // Count students grouped by major (empty / NULL majors -> "Undeclared")
+    private static final String COUNT_BY_MAJOR = "SELECT COALESCE(NULLIF(TRIM(major), ''), 'Undeclared') AS major_name, "
+            + "COUNT(*) AS total FROM students GROUP BY major_name ORDER BY total DESC, major_name ASC";
+
+    // Count students created per month since a given date
+    private static final String COUNT_BY_MONTH = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS total "
+            + "FROM students WHERE created_at >= ? GROUP BY ym ORDER BY ym";
+
+    // Count students created since a given date
+    private static final String COUNT_SINCE = "SELECT COUNT(*) FROM students WHERE created_at >= ?";
+
+    // Statistics: number of students per major (ordered by count desc)
+    public Map<String, Integer> getStudentCountByMajor() throws SQLException {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(COUNT_BY_MAJOR);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                result.put(rs.getString("major_name"), rs.getInt("total"));
+            }
+        }
+        return result;
+    }
+
+    // Statistics: students added per month for the last N months (including the
+    // current month). Months without new students are filled with 0.
+    // Key format: yyyy-MM, ordered from oldest to newest.
+    public Map<String, Integer> getMonthlyGrowth(int months) throws SQLException {
+        if (months < 1) {
+            months = 6;
+        }
+        YearMonth current = YearMonth.now();
+        YearMonth start = current.minusMonths(months - 1);
+
+        // Pre-fill all months with 0 so the chart has a continuous timeline
+        Map<String, Integer> result = new LinkedHashMap<>();
+        for (int i = 0; i < months; i++) {
+            result.put(start.plusMonths(i).toString(), 0);
+        }
+
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(COUNT_BY_MONTH)) {
+            stmt.setTimestamp(1, Timestamp.valueOf(start.atDay(1).atStartOfDay()));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String ym = rs.getString("ym");
+                    if (result.containsKey(ym)) {
+                        result.put(ym, rs.getInt("total"));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    // Statistics: students added in the current month
+    public int getStudentsAddedThisMonth() throws SQLException {
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(COUNT_SINCE)) {
+            stmt.setTimestamp(1, Timestamp.valueOf(YearMonth.now().atDay(1).atStartOfDay()));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 
     // Extract Stu from RS

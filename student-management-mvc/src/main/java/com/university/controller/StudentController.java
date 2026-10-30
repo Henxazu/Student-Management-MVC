@@ -3,6 +3,12 @@ package com.university.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
 import java.util.List;
 
 import com.university.dao.StudentDAO;
@@ -20,6 +26,9 @@ public class StudentController extends HttpServlet {
 
     // Default page size
     private static final int DEFAULT_PAGE_SIZE = 5;
+
+    // Number of months shown in the dashboard growth trend
+    private static final int GROWTH_MONTHS = 6;
 
     // initialization
     @Override
@@ -40,6 +49,9 @@ public class StudentController extends HttpServlet {
 
         try {
             switch (action) {
+                case "dashboard":
+                    showDashboard(rq, rp);
+                    break;
                 case "export":
                     exportCsv(rq, rp);
                     break;
@@ -64,6 +76,12 @@ public class StudentController extends HttpServlet {
                 case "confirmDelete":
                     showConfirmDelete(rq, rp);
                     break;
+                case "confirmBulkDelete":
+                    showConfirmBulkDelete(rq, rp);
+                    break;
+                case "bulkDelete":
+                    bulkDeleteStudents(rq, rp);
+                    break;
                 default:
                     listStudents(rq, rp);
             }
@@ -82,10 +100,80 @@ public class StudentController extends HttpServlet {
                 insertStudent(rq, rp);
             } else if ("update".equals(action)) {
                 updateStudent(rq, rp);
+            } else if ("confirmBulkDelete".equals(action)) {
+                showConfirmBulkDelete(rq, rp);
+            } else if ("bulkDelete".equals(action)) {
+                bulkDeleteStudents(rq, rp);
             }
         } catch (SQLException e) {
             throw new ServletException("DB Error", e);
         }
+    }
+
+    // STATISTICS DASHBOARD
+    private void showDashboard(HttpServletRequest rq, HttpServletResponse rp)
+            throws SQLException, ServletException, IOException {
+        int totalStudents = studentDAO.getTotalStudents();
+        Map<String, Integer> majorStats = studentDAO.getStudentCountByMajor();
+        Map<String, Integer> growthStats = studentDAO.getMonthlyGrowth(GROWTH_MONTHS);
+        int addedThisMonth = studentDAO.getStudentsAddedThisMonth();
+
+        // Convert "yyyy-MM" keys into readable labels (e.g. "Oct 2026")
+        DateTimeFormatter monthFmt = DateTimeFormatter.ofPattern("MMM yyyy", Locale.ENGLISH);
+        List<String> growthLabels = new ArrayList<>();
+        int addedInPeriod = 0;
+        for (Map.Entry<String, Integer> e : growthStats.entrySet()) {
+            growthLabels.add(YearMonth.parse(e.getKey()).format(monthFmt));
+            addedInPeriod += e.getValue();
+        }
+
+        rq.setAttribute("totalStudents", totalStudents);
+        rq.setAttribute("totalMajors", majorStats.size());
+        rq.setAttribute("addedThisMonth", addedThisMonth);
+        rq.setAttribute("addedInPeriod", addedInPeriod);
+        rq.setAttribute("growthMonths", GROWTH_MONTHS);
+        rq.setAttribute("majorStats", majorStats);
+
+        // JSON arrays consumed by Chart.js
+        rq.setAttribute("majorLabelsJson", toJsonStringArray(majorStats.keySet()));
+        rq.setAttribute("majorCountsJson", majorStats.values().toString());
+        rq.setAttribute("growthLabelsJson", toJsonStringArray(growthLabels));
+        rq.setAttribute("growthCountsJson", growthStats.values().toString());
+
+        rq.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(rq, rp);
+    }
+
+    // Build a JSON string array safe to embed inside a <script> tag
+    private String toJsonStringArray(Collection<String> values) {
+        StringBuilder sb = new StringBuilder("[");
+        boolean first = true;
+        for (String v : values) {
+            if (!first) {
+                sb.append(",");
+            }
+            first = false;
+            sb.append("\"");
+            for (char c : (v == null ? "" : v).toCharArray()) {
+                switch (c) {
+                    case '"': sb.append("\\\""); break;
+                    case '\\': sb.append("\\\\"); break;
+                    case '\n': sb.append("\\n"); break;
+                    case '\r': sb.append("\\r"); break;
+                    case '\t': sb.append("\\t"); break;
+                    case '<': sb.append("\\u003c"); break;
+                    case '>': sb.append("\\u003e"); break;
+                    case '&': sb.append("\\u0026"); break;
+                    default:
+                        if (c < 0x20) {
+                            sb.append(String.format("\\u%04x", (int) c));
+                        } else {
+                            sb.append(c);
+                        }
+                }
+            }
+            sb.append("\"");
+        }
+        return sb.append("]").toString();
     }
 
     // EXPORT TO CSV
@@ -136,12 +224,51 @@ public class StudentController extends HttpServlet {
         return value;
     }
 
-    // Show confirmation delete
+    // Show confirmation delete for single student
     private void showConfirmDelete(HttpServletRequest rq, HttpServletResponse rp)
             throws SQLException, ServletException, IOException {
         int id = Integer.parseInt(rq.getParameter("id"));
         Student student = studentDAO.getStudentById(id);
         rq.setAttribute("student", student);
+        rq.getRequestDispatcher("/WEB-INF/views/confirmationPage.jsp")
+                .forward(rq, rp);
+    }
+
+    // Show confirmation delete for multiple selected students
+    private void showConfirmBulkDelete(HttpServletRequest rq, HttpServletResponse rp)
+            throws SQLException, ServletException, IOException {
+        String[] idParams = rq.getParameterValues("selectedIds");
+        if (idParams == null || idParams.length == 0) {
+            idParams = rq.getParameterValues("id");
+        }
+
+        if (idParams == null || idParams.length == 0) {
+            rp.sendRedirect("student?action=list");
+            return;
+        }
+
+        List<Integer> ids = new ArrayList<>();
+        for (String idStr : idParams) {
+            if (idStr != null && !idStr.trim().isEmpty()) {
+                try {
+                    ids.add(Integer.parseInt(idStr.trim()));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+
+        if (ids.isEmpty()) {
+            rp.sendRedirect("student?action=list");
+            return;
+        }
+
+        List<Student> students = studentDAO.getStudentsByIds(ids);
+        if (students.isEmpty()) {
+            rp.sendRedirect("student?action=list");
+            return;
+        }
+
+        rq.setAttribute("students", students);
         rq.getRequestDispatcher("/WEB-INF/views/confirmationPage.jsp")
                 .forward(rq, rp);
     }
@@ -314,11 +441,37 @@ public class StudentController extends HttpServlet {
         rp.sendRedirect("student?action=list");
     }
 
-    // Delete
+    // Delete single student
     private void deleteStudent(HttpServletRequest rq, HttpServletResponse rp)
             throws SQLException, IOException {
         int id = Integer.parseInt(rq.getParameter("id"));
         studentDAO.deleteStudent(id);
+
+        rp.sendRedirect("student?action=list");
+    }
+
+    // Bulk delete selected students
+    private void bulkDeleteStudents(HttpServletRequest rq, HttpServletResponse rp)
+            throws SQLException, IOException {
+        String[] idParams = rq.getParameterValues("selectedIds");
+        if (idParams == null || idParams.length == 0) {
+            idParams = rq.getParameterValues("id");
+        }
+
+        if (idParams != null && idParams.length > 0) {
+            List<Integer> ids = new ArrayList<>();
+            for (String idStr : idParams) {
+                if (idStr != null && !idStr.trim().isEmpty()) {
+                    try {
+                        ids.add(Integer.parseInt(idStr.trim()));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+            if (!ids.isEmpty()) {
+                studentDAO.deleteStudents(ids);
+            }
+        }
 
         rp.sendRedirect("student?action=list");
     }
