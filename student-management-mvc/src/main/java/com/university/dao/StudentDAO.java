@@ -5,12 +5,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.sql.Timestamp;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.university.model.Student;
 
@@ -19,7 +19,7 @@ public class StudentDAO {
     // DB config
     private static final String DB_URL = "jdbc:mysql://localhost:3306/student_management?useSSL=false&allowPublicKeyRetrieval=true";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "180706anhph@n";
+    private static final String DB_PASSWORD = "210606anhph@n";
 
     // SQL queries
     private static final String SELECT_ALL = "SELECT * FROM students ORDER BY student_code";
