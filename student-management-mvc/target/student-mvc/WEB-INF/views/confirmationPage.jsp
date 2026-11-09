@@ -6,7 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Deletion - Student Management</title>
+    <title>Confirm Deletion - EduManage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
@@ -17,7 +19,7 @@
         <div class="nav-container">
             <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
                 <span class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-                <span>EduManage MVC</span>
+                <span>EduManage</span>
             </a>
             <ul class="nav-links">
                 <li><a href="${pageContext.request.contextPath}/student?action=list" class="nav-link"><i class="bi bi-people"></i> Students</a></li>
@@ -30,14 +32,14 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="container" style="max-width: 860px;">
+        <div class="container" style="max-width: 880px;">
             <c:choose>
                 <%-- Bulk delete confirmation view --%>
                 <c:when test="${not empty students}">
                     <div class="page-header">
                         <div class="page-title-group">
                             <h1 style="color:var(--danger);"><i class="bi bi-exclamation-triangle-fill"></i> Confirm Bulk Deletion</h1>
-                            <p class="page-subtitle">Review the students selected for deletion before continuing</p>
+                            <p class="page-subtitle">Verify the student records marked for permanent removal</p>
                         </div>
                     </div>
 
@@ -48,7 +50,7 @@
                                 Warning: Irreversible Action
                             </strong>
                             You are about to permanently delete <strong>${students.size()}</strong> student record(s).
-                            This operation runs within a single database transaction — all selected students will be removed together.
+                            This operation runs within a single database transaction — all selected students will be deleted together, or rolled back if any error occurs.
                         </div>
                     </div>
 
@@ -67,8 +69,12 @@
                                 <tbody>
                                     <c:forEach items="${students}" var="s">
                                         <tr>
-                                            <td><span style="color:var(--text-muted); font-size:0.875rem;">#${s.id}</span></td>
-                                            <td><strong style="font-family: monospace; color:var(--primary);">${s.studentCode}</strong></td>
+                                            <td><span style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">#${s.id}</span></td>
+                                            <td>
+                                                <span class="code-pill">
+                                                    <i class="bi bi-hash" style="opacity:0.6;"></i>${s.studentCode}
+                                                </span>
+                                            </td>
                                             <td style="font-weight:600;"><c:out value="${s.fullName}" /></td>
                                             <td><c:out value="${s.email}" /></td>
                                             <td>
@@ -109,7 +115,7 @@
                     <div class="alert alert-warning">
                         <i class="bi bi-exclamation-circle-fill alert-icon"></i>
                         <div>
-                            <strong>Attention:</strong> Deleting a student removes their entire academic record from the database. This action cannot be undone.
+                            <strong>Attention:</strong> Deleting this student will permanently erase all associated academic enrollment records. This action cannot be reversed.
                         </div>
                     </div>
 
@@ -117,7 +123,7 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="bi bi-person-x-fill" style="color:var(--danger);"></i>
-                                Student Record to be Deleted
+                                Student Record Marked for Removal
                             </h3>
                             <span class="badge badge-default">#${student.id}</span>
                         </div>
@@ -125,7 +131,9 @@
                         <div class="detail-grid" style="margin-top: 10px;">
                             <div class="detail-item">
                                 <div class="detail-label">Student Code</div>
-                                <div class="detail-value" style="font-family: monospace; color:var(--primary);">${student.studentCode}</div>
+                                <div class="detail-value" style="font-family:'JetBrains Mono', monospace; color:var(--primary);">
+                                    ${student.studentCode}
+                                </div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label">Full Name</div>
@@ -141,7 +149,7 @@
                             </div>
                         </div>
 
-                        <div class="form-actions" style="justify-content: flex-end; margin-top: 24px;">
+                        <div class="form-actions" style="justify-content: flex-end; margin-top: 28px;">
                             <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                 Cancel
                             </a>
@@ -157,7 +165,7 @@
                     <div class="card empty-state">
                         <div class="empty-icon"><i class="bi bi-info-circle"></i></div>
                         <h3 class="empty-title">No Student Selected</h3>
-                        <p class="empty-desc">No valid student was selected for deletion.</p>
+                        <p class="empty-desc">No valid student was specified for deletion.</p>
                         <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-primary">
                             <i class="bi bi-arrow-left"></i> Return to Student Directory
                         </a>
@@ -170,7 +178,7 @@
     <!-- Footer -->
     <footer class="app-footer">
         <div class="container">
-            <p>&copy; 2026 Student Management System &bull; Safe Deletion Confirmation</p>
+            <p>&copy; 2026 EduManage System &bull; Safe Deletion Confirmation</p>
         </div>
     </footer>
 </body>

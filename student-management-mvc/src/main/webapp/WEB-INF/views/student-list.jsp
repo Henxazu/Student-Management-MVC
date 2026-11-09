@@ -1,12 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Directory - Student Management</title>
+    <title>Student Directory - EduManage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
@@ -17,7 +20,7 @@
         <div class="nav-container">
             <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
                 <span class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-                <span>EduManage MVC</span>
+                <span>EduManage</span>
             </a>
             <ul class="nav-links">
                 <li><a href="${pageContext.request.contextPath}/student?action=list" class="nav-link active"><i class="bi bi-people"></i> Students</a></li>
@@ -35,7 +38,7 @@
             <div class="page-header">
                 <div class="page-title-group">
                     <h1><i class="bi bi-people-fill" style="color:var(--primary);"></i> Student Directory</h1>
-                    <p class="page-subtitle">Manage, search, sort, and organize student records</p>
+                    <p class="page-subtitle">View, search, sort, and manage all enrolled university students</p>
                 </div>
                 <div class="page-actions">
                     <a href="${pageContext.request.contextPath}/student?action=new" class="btn btn-primary">
@@ -59,8 +62,8 @@
                         <input type="hidden" name="sort" value="${sort}">
                         <input type="hidden" name="order" value="${order}">
                         <input type="hidden" name="pageSize" value="${pageSize}">
-                        <i class="bi bi-search" style="color:var(--text-muted); margin-left:8px;"></i>
-                        <input type="text" name="search" placeholder="Search by code, name, email or major..." value="<c:out value='${search}'/>">
+                        <i class="bi bi-search" style="color:var(--text-muted); margin-left:8px; font-size:1rem;"></i>
+                        <input type="text" name="search" placeholder="Search by student code, name, email or major..." value="<c:out value='${search}'/>" autocomplete="off">
                         <button type="submit" class="btn btn-sm btn-primary" style="margin-right:2px;">Search</button>
                         <c:if test="${not empty search}">
                             <a href="${pageContext.request.contextPath}/student?action=list&pageSize=${pageSize}&sort=${sort}&order=${order}" class="btn btn-sm btn-secondary" title="Clear Search">
@@ -88,13 +91,13 @@
 
                 <!-- Bulk Selection Action Row -->
                 <div class="action-bar-row">
-                    <div style="font-size:0.9rem; color:var(--text-secondary);">
+                    <div style="font-size:0.9rem; color:var(--text-secondary); font-weight:500;">
                         <c:choose>
                             <c:when test="${not empty search}">
-                                Found <strong>${totalStudents}</strong> student(s) matching "<em><c:out value='${search}'/></em>"
+                                Showing results matching "<strong><c:out value='${search}'/></strong>" &bull; <strong>${totalStudents}</strong> student(s) found
                             </c:when>
                             <c:otherwise>
-                                Total enrolled students: <strong>${totalStudents}</strong>
+                                Enrolled students database &bull; Total records: <strong>${totalStudents}</strong>
                             </c:otherwise>
                         </c:choose>
                     </div>
@@ -116,7 +119,7 @@
                             <thead>
                                 <tr>
                                     <th class="checkbox-col">
-                                        <input type="checkbox" id="selectAll" title="Select All">
+                                        <input type="checkbox" id="selectAll" title="Select All Students">
                                     </th>
                                     <th>
                                         <a href="${pageContext.request.contextPath}/student?action=list&sort=id&order=${sort == 'id' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
@@ -136,7 +139,7 @@
                                     </th>
                                     <th>
                                         <a href="${pageContext.request.contextPath}/student?action=list&sort=full_name&order=${sort == 'full_name' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
-                                            Full Name
+                                            Student Name
                                             <span class="sort-indicator ${sort == 'full_name' ? 'active' : 'inactive'}">
                                                 <i class="bi ${sort == 'full_name' ? (order == 'desc' ? 'bi-sort-alpha-down-alt' : 'bi-sort-alpha-down') : 'bi-arrow-down-up'}"></i>
                                             </span>
@@ -168,16 +171,30 @@
                                         <td class="checkbox-col">
                                             <input type="checkbox" name="selectedIds" value="${student.id}" class="student-checkbox">
                                         </td>
-                                        <td><span style="color:var(--text-muted); font-size:0.875rem;">#${student.id}</span></td>
-                                        <td><strong style="color:var(--primary); font-family:monospace; font-size:0.95rem;">${student.studentCode}</strong></td>
+                                        <td><span style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">#${student.id}</span></td>
                                         <td>
-                                            <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" style="color:var(--text-primary); text-decoration:none; font-weight:600;">
-                                                ${student.fullName}
-                                            </a>
+                                            <span class="code-pill">
+                                                <i class="bi bi-hash" style="opacity:0.6;"></i>${student.studentCode}
+                                            </span>
                                         </td>
                                         <td>
-                                            <a href="mailto:${student.email}" style="color:var(--text-secondary); text-decoration:none;">
-                                                <i class="bi bi-envelope" style="font-size:0.85rem; margin-right:4px;"></i>${student.email}
+                                            <div class="user-info-cell">
+                                                <div class="user-avatar-sm">
+                                                    <c:choose>
+                                                        <c:when test="${not empty student.fullName}">
+                                                            ${fn:toUpperCase(fn:substring(student.fullName, 0, 1))}
+                                                        </c:when>
+                                                        <c:otherwise>S</c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="user-name-title">
+                                                    ${student.fullName}
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="mailto:${student.email}" style="color:var(--text-secondary); text-decoration:none; font-size:0.9rem; display:inline-flex; align-items:center; gap:6px;">
+                                                <i class="bi bi-envelope" style="opacity:0.7;"></i>${student.email}
                                             </a>
                                         </td>
                                         <td>
@@ -201,11 +218,11 @@
                                         </td>
                                         <td style="text-align: right; padding-right: 24px;">
                                             <div class="action-group" style="justify-content: flex-end;">
-                                                <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Details">
+                                                <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Profile">
                                                     <i class="bi bi-eye"></i> View
                                                 </a>
                                                 <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-sm btn-secondary" title="Edit Student">
-                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                    <i class="bi bi-pencil"></i> Edit
                                                 </a>
                                                 <a href="${pageContext.request.contextPath}/student?action=confirmDelete&id=${student.id}" class="btn btn-sm btn-danger" title="Delete Student">
                                                     <i class="bi bi-trash3"></i> Delete
@@ -223,26 +240,26 @@
                 <c:if test="${empty students}">
                     <div class="empty-state">
                         <div class="empty-icon"><i class="bi bi-person-x"></i></div>
-                        <h3 class="empty-title">No students found</h3>
+                        <h3 class="empty-title">No matching students found</h3>
                         <p class="empty-desc">
                             <c:choose>
                                 <c:when test="${not empty search}">
-                                    No records matched your search query "<em><c:out value='${search}'/></em>". Try another keyword or clear filters.
+                                    We couldn't find any student records matching "<strong><c:out value='${search}'/></strong>". Check your spelling or reset the search query.
                                 </c:when>
                                 <c:otherwise>
-                                    There are currently no students registered in the system. Get started by enrolling your first student!
+                                    Your student database is currently empty. Get started by enrolling your first student!
                                 </c:otherwise>
                             </c:choose>
                         </p>
                         <c:choose>
                             <c:when test="${not empty search}">
                                 <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Clear Filters
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset Search
                                 </a>
                             </c:when>
                             <c:otherwise>
                                 <a href="${pageContext.request.contextPath}/student?action=new" class="btn btn-primary">
-                                    <i class="bi bi-person-plus-fill"></i> Add First Student
+                                    <i class="bi bi-person-plus-fill"></i> Enroll First Student
                                 </a>
                             </c:otherwise>
                         </c:choose>
@@ -255,7 +272,7 @@
                         <div class="page-info">
                             <c:set var="startIdx" value="${(currentPage - 1) * pageSize + 1}" />
                             <c:set var="endIdx" value="${currentPage * pageSize > totalStudents ? totalStudents : currentPage * pageSize}" />
-                            Showing <strong>${startIdx}</strong> to <strong>${endIdx}</strong> of <strong>${totalStudents}</strong> students
+                            Showing <strong>${startIdx}</strong> &ndash; <strong>${endIdx}</strong> of <strong>${totalStudents}</strong> students
                         </div>
 
                         <ul class="pagination">
@@ -343,7 +360,7 @@
     <!-- Footer -->
     <footer class="app-footer">
         <div class="container">
-            <p>&copy; 2026 Student Management System &bull; Total Students: ${totalStudents}</p>
+            <p>&copy; 2026 EduManage System &bull; Total Enrolled Students: ${totalStudents}</p>
         </div>
     </footer>
 
