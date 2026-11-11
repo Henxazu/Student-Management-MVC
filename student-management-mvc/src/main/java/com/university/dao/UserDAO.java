@@ -1,14 +1,20 @@
 package com.university.dao;
 
-import com.university.model.User;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.mindrot.jbcrypt.BCrypt;
-import java.sql.*;
+
+import com.university.model.User;
 
 public class UserDAO {
     private static final String DB_URL =
     "jdbc:mysql://localhost:3306/student_management";
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "";
+    private static final String DB_PASS = "210606anhph@n";
     private static final String SQL_AUTH =
     "SELECT * FROM users WHERE username = ? AND is_active = TRUE";
     private static final String SQL_UPDATE_LOGIN =

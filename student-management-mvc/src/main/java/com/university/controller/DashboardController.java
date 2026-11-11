@@ -1,12 +1,17 @@
 package com.university.controller;
 
-import com.university.dao.StudentDAO;
-import com.university.model.User;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
+
+import com.university.dao.StudentDAO;
+import com.university.model.User;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/dashboard")
 public class DashboardController extends HttpServlet {
@@ -34,6 +39,6 @@ public class DashboardController extends HttpServlet {
         } catch (SQLException e) {
             throw new ServletException("Database error retrieving student count", e);
         }
-        request.getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
     }
 }

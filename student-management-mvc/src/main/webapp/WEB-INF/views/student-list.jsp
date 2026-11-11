@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,27 +26,6 @@
         </div>
     </div>
 
-    <%-- Authorization error from AdminFilter --%>
-        <c:if test="${not empty param.error}">
-            <div class="alert alert-error">${param.error}</div>
-        </c:if>
-        <%-- "Add Student" button — admin only --%>
-            <c:if test="${sessionScope.role eq 'admin'}">
-                <a href="student?action=new" class="btn-add">Add New Student</a>
-            </c:if>
-            <%-- In <thead>, add Actions column only for admins --%>
-                <c:if test="${sessionScope.role eq 'admin'}">
-                    <th>Actions</th>
-                </c:if>
-                <%-- In each <tr> inside <c:forEach>, add action buttons only for admins --%>
-                        <c:if test="${sessionScope.role eq 'admin'}">
-                            <td>
-                                <a href="student?action=edit&id=${student.id}">Edit</a>
-                                <a href="student?action=delete&id=${student.id}"
-                                    onclick="return confirm('Delete this student?')">Delete</a>
-                            </td>
-                        </c:if>
-
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">
@@ -57,12 +36,20 @@
                     <p class="page-subtitle">View, search, sort, and manage all enrolled university students</p>
                 </div>
                 <div class="page-actions">
-                    <a href="${pageContext.request.contextPath}/student?action=new" class="btn btn-primary">
-                        <i class="bi bi-plus-lg"></i> Add New Student
-                    </a>
+                    <c:if test="${not empty param.error}">
+                        <div class="alert alert-error">${param.error}</div>
+                    </c:if>
+
+                    <c:if test="${sessionScope.role eq 'admin'}">
+                        <a href="${pageContext.request.contextPath}/student?action=new" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add New Student
+                        </a>
+                    </c:if>
+                    
                     <a href="${pageContext.request.contextPath}/student?action=export&format=csv" class="btn btn-success">
                         <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
                     </a>
+                    
                     <a href="${pageContext.request.contextPath}/student?action=dashboard" class="btn btn-secondary">
                         <i class="bi bi-pie-chart-fill"></i> Dashboard
                     </a>
@@ -117,11 +104,14 @@
                             </c:otherwise>
                         </c:choose>
                     </div>
-                    <div>
-                        <button type="submit" form="bulkForm" id="bulkDeleteBtn" class="btn btn-sm btn-danger" disabled>
-                            <i class="bi bi-trash3-fill"></i> Delete Selected (<span id="selectedCount">0</span>)
-                        </button>
-                    </div>
+
+                    <c:if test="${sessionScope.role eq 'admin'}">
+                        <div>
+                            <button type="submit" form="bulkForm" id="bulkDeleteBtn" class="btn btn-sm btn-danger" disabled>
+                                <i class="bi bi-trash3-fill"></i> Delete Selected (<span id="selectedCount">0</span>)
+                            </button>
+                        </div>
+                    </c:if>
                 </div>
             </div>
 
@@ -232,19 +222,27 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td style="text-align: right; padding-right: 24px;">
-                                            <div class="action-group" style="justify-content: flex-end;">
-                                                <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Profile">
-                                                    <i class="bi bi-eye"></i> View
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-sm btn-secondary" title="Edit Student">
-                                                    <i class="bi bi-pencil"></i> Edit
-                                                </a>
-                                                <a href="${pageContext.request.contextPath}/student?action=confirmDelete&id=${student.id}" class="btn btn-sm btn-danger" title="Delete Student">
-                                                    <i class="bi bi-trash3"></i> Delete
-                                                </a>
-                                            </div>
-                                        </td>
+
+                                        <c:if test="${sessionScope.role eq 'admin'}">
+                                            <td style="text-align: right; padding-right: 24px;">
+                                                <div class="action-group" style="justify-content: flex-end;">
+                                                    <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Profile">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
+                                                    <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-sm btn-secondary" title="Edit Student">
+                                                        <i class="bi bi-pencil"></i> Edit
+                                                    </a>
+                                                    <a href="${pageContext.request.contextPath}/student?action=confirmDelete&id=${student.id}" class="btn btn-sm btn-danger" title="Delete Student">
+                                                        <i class="bi bi-trash3"></i> Delete
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </c:if>
+
+                                        <c:if test="${sessionScope.role eq 'user'}">
+                                            <td>None</td>
+                                        </c:if>
+                                        
                                     </tr>
                                 </c:forEach>
                             </tbody>

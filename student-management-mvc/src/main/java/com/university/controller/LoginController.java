@@ -1,10 +1,15 @@
 package com.university.controller;
+import java.io.IOException;
+
 import com.university.dao.UserDAO;
 import com.university.model.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import java.io.IOException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
@@ -26,7 +31,7 @@ public class LoginController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }
-        request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
     /**
@@ -42,7 +47,7 @@ public class LoginController extends HttpServlet {
         if (username == null || username.isBlank() ||
         password == null || password.isBlank()) {
             request.setAttribute("error", "Username and password are required");
-            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
 
@@ -71,7 +76,7 @@ public class LoginController extends HttpServlet {
             // Authentication failed — do not say whether username or password was wrong
             request.setAttribute("error", "Invalid username or password");
             request.setAttribute("username", username); // pre-fill username field
-            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             }
         }
 }
