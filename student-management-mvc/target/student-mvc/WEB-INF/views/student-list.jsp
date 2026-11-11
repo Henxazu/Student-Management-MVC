@@ -15,21 +15,37 @@
 </head>
 
 <body>
-    <!-- Top Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
-                <span class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-                <span>EduManage</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="${pageContext.request.contextPath}/student?action=list" class="nav-link active"><i class="bi bi-people"></i> Students</a></li>
-                <li><a href="${pageContext.request.contextPath}/student?action=new" class="nav-link"><i class="bi bi-person-plus"></i> Add Student</a></li>
-                <li><a href="${pageContext.request.contextPath}/student?action=dashboard" class="nav-link"><i class="bi bi-pie-chart"></i> Dashboard</a></li>
-                <li><a href="${pageContext.request.contextPath}/student?action=export&format=csv" class="nav-link"><i class="bi bi-file-earmark-spreadsheet"></i> Export</a></li>
-            </ul>
+    <%-- Navigation bar — insert at the top of <body> --%>
+    <div class="navbar">
+        <h2>Student Management System</h2>
+        <div class="nav-right">
+            <span>Welcome, ${sessionScope.fullName}</span>
+            <span class="role-badge role-${sessionScope.role}">${sessionScope.role}</span>
+            <a href="dashboard">Dashboard</a>
+            <a href="logout" class="btn-logout">Logout</a>
         </div>
-    </nav>
+    </div>
+
+    <%-- Authorization error from AdminFilter --%>
+        <c:if test="${not empty param.error}">
+            <div class="alert alert-error">${param.error}</div>
+        </c:if>
+        <%-- "Add Student" button — admin only --%>
+            <c:if test="${sessionScope.role eq 'admin'}">
+                <a href="student?action=new" class="btn-add">Add New Student</a>
+            </c:if>
+            <%-- In <thead>, add Actions column only for admins --%>
+                <c:if test="${sessionScope.role eq 'admin'}">
+                    <th>Actions</th>
+                </c:if>
+                <%-- In each <tr> inside <c:forEach>, add action buttons only for admins --%>
+                        <c:if test="${sessionScope.role eq 'admin'}">
+                            <td>
+                                <a href="student?action=edit&id=${student.id}">Edit</a>
+                                <a href="student?action=delete&id=${student.id}"
+                                    onclick="return confirm('Delete this student?')">Delete</a>
+                            </td>
+                        </c:if>
 
     <!-- Main Content -->
     <main class="main-content">

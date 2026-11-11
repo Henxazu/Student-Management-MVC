@@ -1,4 +1,213 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <title>Dashboard - Student Management System</title>
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background: #f0f2f5;
+                }
+
+                .navbar {
+                    background: #2c3e50;
+                    color: white;
+                    padding: 14px 30px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .navbar h2 {
+                    font-size: 18px;
+                }
+
+                .nav-right {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                }
+
+                .role-badge {
+                    padding: 3px 10px;
+                    border-radius: 10px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+
+                .role-admin {
+                    background: #e74c3c;
+                }
+
+                .role-user {
+                    background: #2980b9;
+                }
+
+                .btn-logout {
+                    padding: 7px 16px;
+                    background: #e74c3c;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    font-size: 13px;
+                }
+
+                .btn-logout:hover {
+                    background: #c0392b;
+                }
+
+                .container {
+                    max-width: 1100px;
+                    margin: 30px auto;
+                    padding: 0 20px;
+                }
+
+                .welcome-card {
+                    background: white;
+                    padding: 28px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                    margin-bottom: 24px;
+                }
+
+                .welcome-card h1 {
+                    color: #2c3e50;
+                    font-size: 22px;
+                    margin-bottom: 6px;
+                }
+
+                .welcome-card p {
+                    color: #7f8c8d;
+                    font-size: 14px;
+                }
+
+                .stats-row {
+                    display: flex;
+                    gap: 20px;
+                    margin-bottom: 24px;
+                }
+
+                .stat-card {
+                    flex: 1;
+                    background: white;
+                    padding: 22px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                    text-align: center;
+                }
+
+                .stat-card .number {
+                    font-size: 36px;
+                    font-weight: 700;
+                    color: #2c3e50;
+                }
+
+                .stat-card .label {
+                    font-size: 13px;
+                    color: #7f8c8d;
+                    margin-top: 4px;
+                }
+
+                .actions-card {
+                    background: white;
+                    padding: 28px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                }
+
+                .actions-card h2 {
+                    color: #2c3e50;
+                    font-size: 18px;
+                    margin-bottom: 18px;
+                }
+
+                .actions-grid {
+                    display: flex;
+                    gap: 14px;
+                    flex-wrap: wrap;
+                }
+
+                .action-btn {
+                    padding: 14px 22px;
+                    border-radius: 6px;
+                    text-decoration: none;
+                    color: white;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: opacity 0.2s;
+                }
+
+                .action-btn:hover {
+                    opacity: 0.85;
+                }
+
+                .action-blue {
+                    background: #3498db;
+                }
+
+                .action-green {
+                    background: #27ae60;
+                }
+
+                .action-orange {
+                    background: #e67e22;
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="navbar">
+                <h2>Student Management System</h2>
+                <div class="nav-right">
+                    <span>${sessionScope.fullName}</span>
+                    <span class="role-badge role-${sessionScope.role}">${sessionScope.role}</span>
+                    <a href="logout" class="btn-logout">Logout</a>
+                </div>
+            </div>
+            <div class="container">
+                <div class="welcome-card">
+                    <h1>${welcomeMessage}</h1>
+                    <p>You are signed in as <strong>${sessionScope.role}</strong>.</p>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="number">${totalStudents}</div>
+                        <div class="label">Total Students</div>
+                    </div>
+                </div>
+                <div class="actions-card">
+                    <h2>Quick Actions</h2>
+                    <div class="actions-grid">
+                        <a href="student?action=list" class="action-btn action-blue">
+                            View All Students
+                        </a>
+                        <a href="student?action=search" class="action-btn action-orange">
+                            Search Students
+                        </a>
+                        <%-- Add Student is visible only to admin --%>
+                            <c:if test="${sessionScope.role eq 'admin'}">
+                                <a href="student?action=new" class="action-btn action-green">
+                                    Add New Student
+                                </a>
+                            </c:if>
+                    </div>
+                </div>
+            </div>
+        </body>
+
+        </html>
+
+        <!-- <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
@@ -16,7 +225,6 @@
 </head>
 
 <body>
-    <!-- Top Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
@@ -32,10 +240,10 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+     Main Content 
     <main class="main-content">
         <div class="container">
-            <!-- Header Section -->
+             Header Section 
             <div class="page-header">
                 <div class="page-title-group">
                     <h1><i class="bi bi-pie-chart-fill" style="color:var(--primary);"></i> Academic Analytics Dashboard</h1>
@@ -51,9 +259,9 @@
                 </div>
             </div>
 
-            <!-- Summary Stat Cards -->
+             Summary Stat Cards 
             <div class="stat-cards">
-                <!-- Total Students -->
+                Total Students 
                 <div class="stat-card">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
@@ -64,7 +272,7 @@
                     </div>
                 </div>
 
-                <!-- Academic Majors -->
+                 Academic Majors 
                 <div class="stat-card stat-card-green">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
@@ -75,7 +283,7 @@
                     </div>
                 </div>
 
-                <!-- Added This Month -->
+                 Added This Month 
                 <div class="stat-card stat-card-orange">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
@@ -86,7 +294,7 @@
                     </div>
                 </div>
 
-                <!-- Period Growth -->
+                 Period Growth 
                 <div class="stat-card stat-card-purple">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
@@ -98,9 +306,9 @@
                 </div>
             </div>
 
-            <!-- Chart Visualizations -->
+             Chart Visualizations 
             <div class="chart-grid">
-                <!-- Major Distribution Chart -->
+                 Major Distribution Chart 
                 <div class="chart-box">
                     <h2><i class="bi bi-pie-chart" style="color:var(--primary);"></i> Students by Academic Major</h2>
                     <c:choose>
@@ -118,7 +326,7 @@
                     </c:choose>
                 </div>
 
-                <!-- Enrollment Trend Chart -->
+                 Enrollment Trend Chart 
                 <div class="chart-box">
                     <h2><i class="bi bi-graph-up" style="color:var(--success);"></i> Monthly Enrollment Velocity (Past ${growthMonths} Months)</h2>
                     <div class="chart-canvas">
@@ -127,7 +335,7 @@
                 </div>
             </div>
 
-            <!-- Major Breakdown Table -->
+             Major Breakdown Table 
             <c:if test="${not empty majorStats}">
                 <div class="table-card">
                     <div class="card-header" style="padding: 22px 28px; border-bottom: 1px solid var(--border);">
@@ -177,7 +385,7 @@
         </div>
     </main>
 
-    <!-- Server-side chart data -->
+     Server-side chart data 
     <div id="dashboardData" hidden
         data-major-labels="<c:out value='${majorLabelsJson}' />"
         data-major-counts="<c:out value='${majorCountsJson}' />"
@@ -185,7 +393,7 @@
         data-growth-counts="<c:out value='${growthCountsJson}' />">
     </div>
 
-    <!-- Footer -->
+     Footer 
     <footer class="app-footer">
         <div class="container">
             <p>&copy; 2026 EduManage System &bull; Analytics powered by Chart.js &bull; Clean MVC Architecture</p>
@@ -336,4 +544,4 @@
     </script>
 </body>
 
-</html>
+</html>  -->

@@ -1,3 +1,12 @@
-com\university\dao\StudentDAO.class
+com\university\dao\UserDAO.class
+com\university\filter\AuthFilter.class
+com\university\controller\DashboardController.class
 com\university\model\Student.class
+com\university\model\User.class
+com\university\util\PasswordHashGenerator.class
+com\university\controller\LoginController.class
+com\university\util\CookieUtil.class
 com\university\controller\StudentController.class
+com\university\controller\LogoutController.class
+com\university\filter\AdminFilter.class
+com\university\dao\StudentDAO.class
