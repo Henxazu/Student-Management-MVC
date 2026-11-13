@@ -165,13 +165,19 @@
             </style>
         </head>
 
-        <body>
+        <body class="${cookie.user_theme.value eq 'dark' ? 'dark-theme' : ''}">
             <div class="navbar">
                 <h2>Student Management System</h2>
                 <div class="nav-right">
                     <span>${sessionScope.fullName}</span>
                     <span class="role-badge role-${sessionScope.role}">${sessionScope.role}</span>
-                    <a href="logout" class="btn-logout">Logout</a>
+                    <form action="logout" method="post" style="display:inline;">
+                        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                        <button type="submit" class="btn-logout">Logout</button>
+                    </form>
+                    <a href="theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}">
+                        ${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}
+                    </a>
                 </div>
             </div>
             <div class="container">

@@ -15,7 +15,6 @@
 </head>
 
 <body>
-    <%-- Navigation bar — insert at the top of <body> --%>
     <div class="navbar">
         <h2>Student Management System</h2>
         <div class="nav-right">
@@ -49,6 +48,7 @@
                     <a href="${pageContext.request.contextPath}/student?action=export&format=csv" class="btn btn-success">
                         <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
                     </a>
+                    
                     <a href="${pageContext.request.contextPath}/student?action=dashboard" class="btn btn-secondary">
                         <i class="bi bi-pie-chart-fill"></i> Dashboard
                     </a>
@@ -123,9 +123,11 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th class="checkbox-col">
-                                        <input type="checkbox" id="selectAll" title="Select All Students">
-                                    </th>
+                                    <c:if test="${sessionScope.role eq 'admin'}">
+                                        <th class="checkbox-col">
+                                            <input type="checkbox" id="selectAll" title="Select All Students">
+                                        </th>
+                                    </c:if>
                                     <th>
                                         <a href="${pageContext.request.contextPath}/student?action=list&sort=id&order=${sort == 'id' ? reverseOrder : 'asc'}&pageSize=${pageSize}&search=<c:out value='${search}'/>" class="sort-header">
                                             ID
@@ -173,9 +175,11 @@
                             <tbody>
                                 <c:forEach items="${students}" var="student">
                                     <tr id="row-${student.id}">
-                                        <td class="checkbox-col">
-                                            <input type="checkbox" name="selectedIds" value="${student.id}" class="student-checkbox">
-                                        </td>
+                                        <c:if test="${sessionScope.role eq 'admin'}">
+                                            <td class="checkbox-col">
+                                                <input type="checkbox" name="selectedIds" value="${student.id}" class="student-checkbox">
+                                            </td>
+                                        </c:if>
                                         <td><span style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">#${student.id}</span></td>
                                         <td>
                                             <span class="code-pill">
@@ -222,25 +226,21 @@
                                             </c:choose>
                                         </td>
 
-                                        <c:if test="${sessionScope.role eq 'admin'}">
-                                            <td style="text-align: right; padding-right: 24px;">
-                                                <div class="action-group" style="justify-content: flex-end;">
-                                                    <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Profile">
-                                                        <i class="bi bi-eye"></i> View
-                                                    </a>
+                                        <td style="text-align: right; padding-right: 24px;">
+                                            <div class="action-group" style="justify-content: flex-end;">
+                                                <a href="${pageContext.request.contextPath}/student?action=view&id=${student.id}" class="btn btn-sm btn-secondary" title="View Profile">
+                                                    <i class="bi bi-eye"></i> View
+                                                </a>
+                                                <c:if test="${sessionScope.role eq 'admin'}">
                                                     <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-sm btn-secondary" title="Edit Student">
                                                         <i class="bi bi-pencil"></i> Edit
                                                     </a>
                                                     <a href="${pageContext.request.contextPath}/student?action=confirmDelete&id=${student.id}" class="btn btn-sm btn-danger" title="Delete Student">
                                                         <i class="bi bi-trash3"></i> Delete
                                                     </a>
-                                                </div>
-                                            </td>
-                                        </c:if>
-
-                                        <c:if test="${sessionScope.role eq 'user'}">
-                                            <td>None</td>
-                                        </c:if>
+                                                </c:if>
+                                            </div>
+                                        </td>
                                         
                                     </tr>
                                 </c:forEach>

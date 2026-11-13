@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -28,6 +29,46 @@ public class UserDAO {
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC driver not found", e);
+        }
+    }
+    //Token management for "Remember Me" functionality
+    public void saveToken(int userId, String token, Timestamp expiry) {
+        String sql = "UPDATE users SET remember_token = ?, token_expiry = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, token);
+            ps.setTimestamp(2, expiry);
+            ps.setInt(3, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public User findUserByToken(String token) {
+        String sql = "SELECT * FROM users WHERE remember_token = ? AND token_expiry > NOW()";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, token);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void clearToken(int userId) {
+        String sql = "UPDATE users SET remember_token = NULL, token_expiry = NULL WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

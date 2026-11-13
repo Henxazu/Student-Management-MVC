@@ -35,7 +35,12 @@ public class DashboardController extends HttpServlet {
         request.setAttribute("welcomeMessage", "Welcome back, " + user.getFullName()
                 + "!");
         try {
-            request.setAttribute("totalStudents", studentDAO.getTotalStudents());
+            Integer count = (Integer) getServletContext().getAttribute("cachedStudentCount");
+            if (count == null) {
+                count = studentDAO.getTotalStudents();
+                getServletContext().setAttribute("cachedStudentCount", count);
+            }
+            request.setAttribute("totalStudents", count);
         } catch (SQLException e) {
             throw new ServletException("Database error retrieving student count", e);
         }

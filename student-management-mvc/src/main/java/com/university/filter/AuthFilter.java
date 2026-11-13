@@ -1,11 +1,23 @@
 package com.university.filter;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import com.university.dao.UserDAO;
+import com.university.model.User;
+import com.university.util.CookieUtil;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * AuthFilter — intercepts every request.
@@ -47,6 +59,18 @@ public class AuthFilter implements Filter {
         if (loggedIn) {
             chain.doFilter(request, response);
         } else {
+            String token = CookieUtil.get(httpReq, "remember_token");
+            if (token != null) {
+                UserDAO userDAO = new UserDAO();
+                User user = userDAO.findUserByToken(token);
+                if (user != null) {
+                    // Valid token found, create a new session and set the user
+                    session = httpReq.getSession(true);
+                    session.setAttribute("user", user);
+                    chain.doFilter(request, response);
+                    return;
+                }
+            }
             // Preserve the originally requested URL so the user can be
             // redirected back after a successful login (optional enhancement)
             httpResp.sendRedirect(contextPath + "/login");

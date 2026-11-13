@@ -7,10 +7,11 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.List;
 
+import com.university.dao.AuditLogger;
 import com.university.dao.StudentDAO;
 import com.university.model.Student;
 
@@ -421,6 +422,8 @@ public class StudentController extends HttpServlet {
         s.setMajor(rq.getParameter("major"));
 
         studentDAO.insertStudent(s);
+        getServletContext().removeAttribute("cachedStudentCount");
+        AuditLogger.log(null, "INSERT_STUDENT", "Inserted new student: " + s.getStudentCode(), rq);
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
@@ -437,7 +440,7 @@ public class StudentController extends HttpServlet {
         s.setId(id);
 
         studentDAO.updateStudent(s);
-
+        AuditLogger.log(id, "UPDATE_STUDENT", "Updated student: " + s.getStudentCode(), rq);
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
@@ -446,7 +449,8 @@ public class StudentController extends HttpServlet {
             throws SQLException, IOException {
         int id = Integer.parseInt(rq.getParameter("id"));
         studentDAO.deleteStudent(id);
-
+        getServletContext().removeAttribute("cachedStudentCount");
+        AuditLogger.log(id, "DELETE_STUDENT", "Deleted student with ID: " + id, rq);
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
