@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <!DOCTYPE html>
         <html lang="en">
 
@@ -11,6 +11,30 @@
                     margin: 0;
                     padding: 0;
                     box-sizing: border-box;
+                }
+                
+                /* Add inside <style> in dashboard.jsp */
+                body.dark-theme {
+                    background: #0f172a;
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .welcome-card,
+                body.dark-theme .stat-card,
+                body.dark-theme .actions-card {
+                    background: #1e293b;
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .welcome-card h1,
+                body.dark-theme .stat-card .number,
+                body.dark-theme .actions-card h2 {
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .welcome-card p,
+                body.dark-theme .stat-card .label {
+                    color: #94a3b8;
                 }
 
                 body {

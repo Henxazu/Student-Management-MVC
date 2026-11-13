@@ -20,12 +20,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * AuthFilter — intercepts every request.
- * Requests to public paths are allowed through unconditionally.
- * Requests to protected paths require an authenticated session.
+ * AuthFilter — intercepts every request. Requests to public paths are allowed
+ * through unconditionally. Requests to protected paths require an authenticated
+ * session.
  */
-@WebFilter(filterName = "AuthFilter", urlPatterns = { "/*" })
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"})
 public class AuthFilter implements Filter {
+
     // Paths that must be accessible without a session
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/login",
@@ -64,9 +65,12 @@ public class AuthFilter implements Filter {
                 UserDAO userDAO = new UserDAO();
                 User user = userDAO.findUserByToken(token);
                 if (user != null) {
-                    // Valid token found, create a new session and set the user
                     session = httpReq.getSession(true);
                     session.setAttribute("user", user);
+                    session.setAttribute("role", user.getRole());
+                    session.setAttribute("fullName", user.getFullName());
+                    session.setAttribute("csrfToken", java.util.UUID.randomUUID().toString());
+                    session.setMaxInactiveInterval(30 * 60);
                     chain.doFilter(request, response);
                     return;
                 }

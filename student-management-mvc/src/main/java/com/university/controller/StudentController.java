@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/student")
 public class StudentController extends HttpServlet {
+
     private StudentDAO studentDAO;
 
     // Default page size
@@ -156,14 +157,30 @@ public class StudentController extends HttpServlet {
             sb.append("\"");
             for (char c : (v == null ? "" : v).toCharArray()) {
                 switch (c) {
-                    case '"': sb.append("\\\""); break;
-                    case '\\': sb.append("\\\\"); break;
-                    case '\n': sb.append("\\n"); break;
-                    case '\r': sb.append("\\r"); break;
-                    case '\t': sb.append("\\t"); break;
-                    case '<': sb.append("\\u003c"); break;
-                    case '>': sb.append("\\u003e"); break;
-                    case '&': sb.append("\\u0026"); break;
+                    case '"':
+                        sb.append("\\\"");
+                        break;
+                    case '\\':
+                        sb.append("\\\\");
+                        break;
+                    case '\n':
+                        sb.append("\\n");
+                        break;
+                    case '\r':
+                        sb.append("\\r");
+                        break;
+                    case '\t':
+                        sb.append("\\t");
+                        break;
+                    case '<':
+                        sb.append("\\u003c");
+                        break;
+                    case '>':
+                        sb.append("\\u003e");
+                        break;
+                    case '&':
+                        sb.append("\\u0026");
+                        break;
                     default:
                         if (c < 0x20) {
                             sb.append(String.format("\\u%04x", (int) c));
@@ -423,7 +440,7 @@ public class StudentController extends HttpServlet {
 
         studentDAO.insertStudent(s);
         getServletContext().removeAttribute("cachedStudentCount");
-        AuditLogger.log(null, "INSERT_STUDENT", "Inserted new student: " + s.getStudentCode(), rq);
+        AuditLogger.log(getCurrentUserId(rq), "STUDENT_CREATE", "Created student: " + s.getStudentCode(), rq);
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
@@ -440,7 +457,7 @@ public class StudentController extends HttpServlet {
         s.setId(id);
 
         studentDAO.updateStudent(s);
-        AuditLogger.log(id, "UPDATE_STUDENT", "Updated student: " + s.getStudentCode(), rq);
+        AuditLogger.log(getCurrentUserId(rq), "STUDENT_UPDATE", "Updated student ID " + id + ": " + s.getStudentCode(), rq);
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
@@ -450,7 +467,7 @@ public class StudentController extends HttpServlet {
         int id = Integer.parseInt(rq.getParameter("id"));
         studentDAO.deleteStudent(id);
         getServletContext().removeAttribute("cachedStudentCount");
-        AuditLogger.log(id, "DELETE_STUDENT", "Deleted student with ID: " + id, rq);
+        AuditLogger.log(getCurrentUserId(rq), "STUDENT_DELETE", "Deleted student ID: " + id, rq);
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
     }
 
@@ -474,9 +491,17 @@ public class StudentController extends HttpServlet {
             }
             if (!ids.isEmpty()) {
                 studentDAO.deleteStudents(ids);
+                getServletContext().removeAttribute("cachedStudentCount");
             }
         }
 
         rp.sendRedirect(rq.getContextPath() + "/student?action=list");
+    }
+
+    private Integer getCurrentUserId(HttpServletRequest rq) {
+        jakarta.servlet.http.HttpSession session = rq.getSession(false);
+        com.university.model.User user = (session != null)
+                ? (com.university.model.User) session.getAttribute("user") : null;
+        return (user != null) ? user.getId() : null;
     }
 }

@@ -12,16 +12,17 @@ import org.mindrot.jbcrypt.BCrypt;
 import com.university.model.User;
 
 public class UserDAO {
-    private static final String DB_URL =
-    "jdbc:mysql://localhost:3306/student_management";
+
+    private static final String DB_URL
+            = "jdbc:mysql://localhost:3306/student_management";
     private static final String DB_USER = "root";
     private static final String DB_PASS = "210606anhph@n";
-    private static final String SQL_AUTH =
-    "SELECT * FROM users WHERE username = ? AND is_active = TRUE";
-    private static final String SQL_UPDATE_LOGIN =
-    "UPDATE users SET last_login = NOW() WHERE id = ?";
-    private static final String SQL_BY_ID =
-    "SELECT * FROM users WHERE id = ?";
+    private static final String SQL_AUTH
+            = "SELECT * FROM users WHERE username = ? AND is_active = TRUE";
+    private static final String SQL_UPDATE_LOGIN
+            = "UPDATE users SET last_login = NOW() WHERE id = ?";
+    private static final String SQL_BY_ID
+            = "SELECT * FROM users WHERE id = ?";
 
     private Connection getConnection() throws SQLException {
         try {
@@ -31,14 +32,14 @@ public class UserDAO {
             throw new SQLException("MySQL JDBC driver not found", e);
         }
     }
+
     //Token management for "Remember Me" functionality
     public void saveToken(int userId, String token, Timestamp expiry) {
-        String sql = "UPDATE users SET remember_token = ?, token_expiry = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, token);
-            ps.setTimestamp(2, expiry);
-            ps.setInt(3, userId);
+        String sql = "INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setString(2, token);
+            ps.setTimestamp(3, expiry);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -46,9 +47,10 @@ public class UserDAO {
     }
 
     public User findUserByToken(String token) {
-        String sql = "SELECT * FROM users WHERE remember_token = ? AND token_expiry > NOW()";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT u.* FROM users u "
+                + "JOIN remember_tokens rt ON u.id = rt.user_id "
+                + "WHERE rt.token = ? AND rt.expires_at > NOW() AND u.is_active = TRUE";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, token);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -61,11 +63,10 @@ public class UserDAO {
         return null;
     }
 
-    public void clearToken(int userId) {
-        String sql = "UPDATE users SET remember_token = NULL, token_expiry = NULL WHERE id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+    public void deleteToken(String token) {
+        String sql = "DELETE FROM remember_tokens WHERE token = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, token);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -73,54 +74,51 @@ public class UserDAO {
     }
 
     /**
-     * Verify username and password.
-     * Returns the User object if authentication succeeds; null otherwise.
+     * Verify username and password. Returns the User object if authentication
+     * succeeds; null otherwise.
      *
      * The method never reveals whether the username or the password was wrong —
      * returning null for both cases prevents username enumeration attacks.
      */
     public User authenticate(String username, String password) {
-        try (Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(SQL_AUTH)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(SQL_AUTH)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                String storedHash = rs.getString("password");
-                // BCrypt.checkpw extracts the salt from the hash automatically
-                if (BCrypt.checkpw(password, storedHash)) {
-                    User user = mapRow(rs);
-                    updateLastLogin(user.getId());
-                    return user;
+                if (rs.next()) {
+                    String storedHash = rs.getString("password");
+                    // BCrypt.checkpw extracts the salt from the hash automatically
+                    if (BCrypt.checkpw(password, storedHash)) {
+                        User user = mapRow(rs);
+                        updateLastLogin(user.getId());
+                        return user;
                     }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-            return null; // authentication failed
-        }
+        return null; // authentication failed
+    }
 
-        /**
-         * Record the timestamp of a successful login.
-         * Called internally by authenticate().
-         */
-        private void updateLastLogin(int userId) {
-        try (Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_LOGIN)) {
+    /**
+     * Record the timestamp of a successful login. Called internally by
+     * authenticate().
+     */
+    private void updateLastLogin(int userId) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_LOGIN)) {
             ps.setInt(1, userId);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     /**
-     * Retrieve a user by primary key.
-     * Used to restore a User object from a session that stores only the ID.
+     * Retrieve a user by primary key. Used to restore a User object from a
+     * session that stores only the ID.
      */
     public User getUserById(int id) {
-        try (Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(SQL_BY_ID)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(SQL_BY_ID)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

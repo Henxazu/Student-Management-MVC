@@ -74,27 +74,38 @@
     box-sizing: border-box;
 }
 
-body.dark-theme{
-    --bg-page: #0f172a;
-    --bg-surface: #1e293b;
-    --bg-surface-elevated: #1e293b;
-    --bg-muted: #1e293b;
-    --bg-hover: #334155;
+body.dark-theme {
+    background: #0f172a;
+    color: #f8fafc;
+}
 
-    --border: #334155;
-    --border-hover: #475569;
-    --border-focus: #4f46e5;
+body.dark-theme .welcome-card,
+body.dark-theme .stat-card,
+body.dark-theme .actions-card {
+    background: #1e293b;
+    color: #f8fafc;
+}
 
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --text-inverse: #ffffff;
+body.dark-theme .welcome-card h1,
+body.dark-theme .stat-card .number,
+body.dark-theme .actions-card h2 {
+    color: #f8fafc;
+}
+
+body.dark-theme .welcome-card p,
+body.dark-theme .stat-card .label {
+    color: #94a3b8;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
 }
 
 body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-page);
-    background-image: 
+    background-image:
         radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.04) 0px, transparent 50%),
         radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.04) 0px, transparent 50%);
     background-attachment: fixed;
@@ -856,7 +867,7 @@ tr.selected-row:hover {
     bottom: -30px;
     width: 180px;
     height: 180px;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
     border-radius: 50%;
 }
 
@@ -1291,25 +1302,32 @@ tr.selected-row:hover {
     .nav-container {
         padding: 0 16px;
     }
+
     .main-content {
         padding: 20px 16px;
     }
+
     .chart-grid {
         grid-template-columns: 1fr;
     }
+
     .hero {
         padding: 40px 24px;
     }
+
     .hero h1 {
         font-size: 2rem;
     }
+
     .toolbar-row {
         flex-direction: column;
         align-items: stretch;
     }
+
     .search-box {
         max-width: 100%;
     }
+
     .action-bar-row {
         flex-direction: column;
         align-items: stretch;

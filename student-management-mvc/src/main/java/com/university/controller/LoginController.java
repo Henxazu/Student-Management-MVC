@@ -49,11 +49,6 @@ public class LoginController extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        // Optional: handle "Remember Me" checkbox
-        if ("on".equals(request.getParameter("rememberMe")) && username != null && !username.isBlank()) {
-            String token = UUID.randomUUID().toString();
-            CookieUtil.set(response, "remember_me", token, 30 * 24 * 60 * 60); // 30 days in seconds
-        }
 
         // Server-side validation — never rely on the browser alone
         if (username == null || username.isBlank()
@@ -67,7 +62,7 @@ public class LoginController extends HttpServlet {
         if (LoginAttemptTracker.isBlocked(username)) {
             request.setAttribute("error", "Account temporarily locked. Try again later.");
             request.setAttribute("username", username); // pre-fill username field
-            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             return;
         }
 
@@ -78,6 +73,15 @@ public class LoginController extends HttpServlet {
             AuditLogger.log(userId, "LOGIN_SUCCESS", "User logged in successfully", request);
             // reset failed attempts on successful login
             LoginAttemptTracker.reset(username);
+
+            if ("on".equals(request.getParameter("remember"))) {
+                String token = UUID.randomUUID().toString();
+                int maxAge = 30 * 24 * 60 * 60; // 30 days
+                java.sql.Timestamp expiry = java.sql.Timestamp.from(
+                        java.time.Instant.now().plusSeconds(maxAge));
+                userDAO.saveToken(user.getId(), token, expiry);
+                CookieUtil.set(response, "remember_token", token, maxAge);
+            }
             // --- Session fixation protection ---
             // If a session exists from before login (anonymous browsing),
             // destroy it so the attacker cannot reuse the pre-login session ID.
@@ -102,7 +106,7 @@ public class LoginController extends HttpServlet {
             LoginAttemptTracker.recordFailure(username);
             request.setAttribute("error", "Invalid username or password");
             request.setAttribute("username", username);
-            request.getRequestDispatcher("/views/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
         }
     }
 }
