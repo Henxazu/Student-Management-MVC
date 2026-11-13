@@ -27,7 +27,6 @@
                             <button type="submit" class="btn-logout">Logout</button>
                         </form>
                         <a href="theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}">
-                        <a href="theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}">
                             ${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}
                         </a>
                     </div>

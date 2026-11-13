@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <!DOCTYPE html>
         <html lang="en">
 
@@ -11,6 +11,30 @@
                     margin: 0;
                     padding: 0;
                     box-sizing: border-box;
+                }
+                
+                /* Add inside <style> in dashboard.jsp */
+                body.dark-theme {
+                    background: #0f172a;
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .welcome-card,
+                body.dark-theme .stat-card,
+                body.dark-theme .actions-card {
+                    background: #1e293b;
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .welcome-card h1,
+                body.dark-theme .stat-card .number,
+                body.dark-theme .actions-card h2 {
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .welcome-card p,
+                body.dark-theme .stat-card .label {
+                    color: #94a3b8;
                 }
 
                 body {
@@ -165,13 +189,19 @@
             </style>
         </head>
 
-        <body>
+        <body class="${cookie.user_theme.value eq 'dark' ? 'dark-theme' : ''}">
             <div class="navbar">
                 <h2>Student Management System</h2>
                 <div class="nav-right">
                     <span>${sessionScope.fullName}</span>
                     <span class="role-badge role-${sessionScope.role}">${sessionScope.role}</span>
-                    <a href="logout" class="btn-logout">Logout</a>
+                    <form action="logout" method="post" style="display:inline;">
+                        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                        <button type="submit" class="btn-logout">Logout</button>
+                    </form>
+                    <a href="theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}">
+                        ${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}
+                    </a>
                 </div>
             </div>
             <div class="container">
