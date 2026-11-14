@@ -7,26 +7,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>Student Profile: ${student.fullName} - EduManage</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/student-detail.css">
 </head>
 
-<body>
+<body class="${cookie.user_theme.value eq 'dark' ? 'dark-theme' : ''}">
     <!-- Top Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
+            <a href="${pageContext.request.contextPath}/dashboard" class="nav-brand">
                 <span class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
                 <span>EduManage</span>
             </a>
             <ul class="nav-links">
                 <li><a href="${pageContext.request.contextPath}/student?action=list" class="nav-link"><i class="bi bi-people"></i> Students</a></li>
-                <li><a href="${pageContext.request.contextPath}/student?action=new" class="nav-link"><i class="bi bi-person-plus"></i> Add Student</a></li>
-                <li><a href="${pageContext.request.contextPath}/student?action=dashboard" class="nav-link"><i class="bi bi-pie-chart"></i> Dashboard</a></li>
+                <c:if test="${sessionScope.role eq 'admin'}">
+                    <li><a href="${pageContext.request.contextPath}/student?action=new" class="nav-link"><i class="bi bi-person-plus"></i> Add Student</a></li>
+                </c:if>
+                <li><a href="${pageContext.request.contextPath}/dashboard" class="nav-link"><i class="bi bi-pie-chart"></i> Dashboard</a></li>
                 <li><a href="${pageContext.request.contextPath}/student?action=export&format=csv" class="nav-link"><i class="bi bi-file-earmark-spreadsheet"></i> Export</a></li>
+                <li><a href="${pageContext.request.contextPath}/theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}" class="nav-link">${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}</a></li>
             </ul>
         </div>
     </nav>
@@ -50,10 +54,10 @@
                             <div class="detail-header-info">
                                 <h2><c:out value="${student.fullName}" /></h2>
                                 <p>
-                                    <span style="font-family:'JetBrains Mono', monospace; font-weight:600; background:rgba(255,255,255,0.18); padding:3px 10px; border-radius:6px;">
+                                    <span class="banner-code-pill">
                                         <i class="bi bi-hash"></i>${student.studentCode}
                                     </span>
-                                    <span><i class="bi bi-envelope-fill" style="opacity:0.7;"></i> ${student.email}</span>
+                                    <span><i class="bi bi-envelope-fill subtle-icon"></i> ${student.email}</span>
                                 </p>
                             </div>
                         </div>
@@ -62,49 +66,49 @@
                         <div class="detail-body">
                             <div class="detail-grid">
                                 <div class="detail-item">
-                                    <div class="detail-label"><i class="bi bi-key-fill" style="margin-right:4px;"></i> System Identifier</div>
+                                    <div class="detail-label"><i class="bi bi-key-fill label-icon"></i> System Identifier</div>
                                     <div class="detail-value">#${student.id}</div>
                                 </div>
 
                                 <div class="detail-item">
-                                    <div class="detail-label"><i class="bi bi-person-vcard-fill" style="margin-right:4px;"></i> Student Code</div>
-                                    <div class="detail-value" style="font-family:'JetBrains Mono', monospace; color:var(--primary);">
+                                    <div class="detail-label"><i class="bi bi-person-vcard-fill label-icon"></i> Student Code</div>
+                                    <div class="detail-value detail-value-code">
                                         ${student.studentCode}
                                     </div>
                                 </div>
 
                                 <div class="detail-item">
-                                    <div class="detail-label"><i class="bi bi-person-fill" style="margin-right:4px;"></i> Full Name</div>
+                                    <div class="detail-label"><i class="bi bi-person-fill label-icon"></i> Full Name</div>
                                     <div class="detail-value"><c:out value="${student.fullName}" /></div>
                                 </div>
 
                                 <div class="detail-item">
-                                    <div class="detail-label"><i class="bi bi-envelope-at-fill" style="margin-right:4px;"></i> Contact Email</div>
+                                    <div class="detail-label"><i class="bi bi-envelope-at-fill label-icon"></i> Contact Email</div>
                                     <div class="detail-value">
-                                        <a href="mailto:${student.email}" style="color:var(--primary); text-decoration:none;">
+                                        <a href="mailto:${student.email}" class="detail-email-link">
                                             <c:out value="${student.email}" />
                                         </a>
                                     </div>
                                 </div>
 
-                                <div class="detail-item" style="grid-column: 1 / -1;">
-                                    <div class="detail-label"><i class="bi bi-mortarboard-fill" style="margin-right:4px;"></i> Academic Program &amp; Major</div>
-                                    <div class="detail-value" style="margin-top: 6px;">
+                                <div class="detail-item detail-item-full">
+                                    <div class="detail-label"><i class="bi bi-mortarboard-fill label-icon"></i> Academic Program &amp; Major</div>
+                                    <div class="detail-value detail-major-value">
                                         <c:choose>
                                             <c:when test="${student.major == 'Computer Science'}">
-                                                <span class="badge badge-cs" style="font-size: 0.95rem; padding: 7px 16px;"><i class="bi bi-laptop"></i> ${student.major}</span>
+                                                <span class="badge badge-cs badge-lg"><i class="bi bi-laptop"></i> ${student.major}</span>
                                             </c:when>
                                             <c:when test="${student.major == 'Information Technology'}">
-                                                <span class="badge badge-it" style="font-size: 0.95rem; padding: 7px 16px;"><i class="bi bi-cpu"></i> ${student.major}</span>
+                                                <span class="badge badge-it badge-lg"><i class="bi bi-cpu"></i> ${student.major}</span>
                                             </c:when>
                                             <c:when test="${student.major == 'Software Engineering'}">
-                                                <span class="badge badge-se" style="font-size: 0.95rem; padding: 7px 16px;"><i class="bi bi-code-slash"></i> ${student.major}</span>
+                                                <span class="badge badge-se badge-lg"><i class="bi bi-code-slash"></i> ${student.major}</span>
                                             </c:when>
                                             <c:when test="${student.major == 'Data Science'}">
-                                                <span class="badge badge-ds" style="font-size: 0.95rem; padding: 7px 16px;"><i class="bi bi-graph-up"></i> ${student.major}</span>
+                                                <span class="badge badge-ds badge-lg"><i class="bi bi-graph-up"></i> ${student.major}</span>
                                             </c:when>
                                             <c:otherwise>
-                                                <span class="badge badge-default" style="font-size: 0.95rem; padding: 7px 16px;"><i class="bi bi-bookmark"></i> ${student.major}</span>
+                                                <span class="badge badge-default badge-lg"><i class="bi bi-bookmark"></i> ${student.major}</span>
                                             </c:otherwise>
                                         </c:choose>
                                     </div>
@@ -112,11 +116,11 @@
                             </div>
 
                             <!-- Actions -->
-                            <div class="form-actions" style="justify-content: space-between; margin-top: 36px;">
+                            <div class="form-actions">
                                 <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Return to Directory
                                 </a>
-                                <div style="display: flex; gap: 10px;">
+                                <div class="action-btn-group">
                                     <a href="${pageContext.request.contextPath}/student?action=edit&id=${student.id}" class="btn btn-primary">
                                         <i class="bi bi-pencil-square"></i> Edit Profile
                                     </a>

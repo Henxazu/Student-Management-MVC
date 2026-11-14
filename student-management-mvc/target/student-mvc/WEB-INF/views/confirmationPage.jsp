@@ -6,39 +6,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>Confirm Deletion - EduManage</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/confirmationPage.css">
 </head>
 
-<body>
+<body class="${cookie.user_theme.value eq 'dark' ? 'dark-theme' : ''}">
     <!-- Top Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
+            <a href="${pageContext.request.contextPath}/dashboard" class="nav-brand">
                 <span class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
                 <span>EduManage</span>
             </a>
             <ul class="nav-links">
                 <li><a href="${pageContext.request.contextPath}/student?action=list" class="nav-link"><i class="bi bi-people"></i> Students</a></li>
                 <li><a href="${pageContext.request.contextPath}/student?action=new" class="nav-link"><i class="bi bi-person-plus"></i> Add Student</a></li>
-                <li><a href="${pageContext.request.contextPath}/student?action=dashboard" class="nav-link"><i class="bi bi-pie-chart"></i> Dashboard</a></li>
+                <li><a href="${pageContext.request.contextPath}/dashboard" class="nav-link"><i class="bi bi-pie-chart"></i> Dashboard</a></li>
                 <li><a href="${pageContext.request.contextPath}/student?action=export&format=csv" class="nav-link"><i class="bi bi-file-earmark-spreadsheet"></i> Export</a></li>
+                <li><a href="${pageContext.request.contextPath}/theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}" class="nav-link">${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="container" style="max-width: 880px;">
+        <div class="container confirm-container">
             <c:choose>
                 <%-- Bulk delete confirmation view --%>
                 <c:when test="${not empty students}">
                     <div class="page-header">
                         <div class="page-title-group">
-                            <h1 style="color:var(--danger);"><i class="bi bi-exclamation-triangle-fill"></i> Confirm Bulk Deletion</h1>
+                            <h1 class="danger-title"><i class="bi bi-exclamation-triangle-fill"></i> Confirm Bulk Deletion</h1>
                             <p class="page-subtitle">Verify the student records marked for permanent removal</p>
                         </div>
                     </div>
@@ -46,7 +48,7 @@
                     <div class="alert alert-danger">
                         <i class="bi bi-shield-exclamation alert-icon"></i>
                         <div>
-                            <strong style="font-size:1.05rem; display:block; margin-bottom:4px;">
+                            <strong class="alert-heading">
                                 Warning: Irreversible Action
                             </strong>
                             You are about to permanently delete <strong>${students.size()}</strong> student record(s).
@@ -69,13 +71,13 @@
                                 <tbody>
                                     <c:forEach items="${students}" var="s">
                                         <tr>
-                                            <td><span style="color:var(--text-muted); font-size:0.85rem; font-weight:600;">#${s.id}</span></td>
+                                            <td><span class="id-badge">#${s.id}</span></td>
                                             <td>
                                                 <span class="code-pill">
-                                                    <i class="bi bi-hash" style="opacity:0.6;"></i>${s.studentCode}
+                                                    <i class="bi bi-hash subtle-icon"></i>${s.studentCode}
                                                 </span>
                                             </td>
-                                            <td style="font-weight:600;"><c:out value="${s.fullName}" /></td>
+                                            <td class="name-cell"><c:out value="${s.fullName}" /></td>
                                             <td><c:out value="${s.email}" /></td>
                                             <td>
                                                 <span class="badge badge-default">${s.major}</span>
@@ -92,7 +94,7 @@
                         <c:forEach items="${students}" var="s">
                             <input type="hidden" name="selectedIds" value="${s.id}">
                         </c:forEach>
-                        <div class="form-actions" style="justify-content: flex-end;">
+                        <div class="form-actions">
                             <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                 Cancel
                             </a>
@@ -107,7 +109,7 @@
                 <c:when test="${not empty student}">
                     <div class="page-header">
                         <div class="page-title-group">
-                            <h1 style="color:var(--danger);"><i class="bi bi-exclamation-triangle-fill"></i> Confirm Deletion</h1>
+                            <h1 class="danger-title"><i class="bi bi-exclamation-triangle-fill"></i> Confirm Deletion</h1>
                             <p class="page-subtitle">Are you sure you want to delete this student?</p>
                         </div>
                     </div>
@@ -122,16 +124,16 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="bi bi-person-x-fill" style="color:var(--danger);"></i>
+                                <i class="bi bi-person-x-fill danger-icon"></i>
                                 Student Record Marked for Removal
                             </h3>
                             <span class="badge badge-default">#${student.id}</span>
                         </div>
 
-                        <div class="detail-grid" style="margin-top: 10px;">
+                        <div class="detail-grid">
                             <div class="detail-item">
                                 <div class="detail-label">Student Code</div>
-                                <div class="detail-value" style="font-family:'JetBrains Mono', monospace; color:var(--primary);">
+                                <div class="detail-value detail-value-code">
                                     ${student.studentCode}
                                 </div>
                             </div>
@@ -149,7 +151,7 @@
                             </div>
                         </div>
 
-                        <div class="form-actions" style="justify-content: flex-end; margin-top: 28px;">
+                        <div class="form-actions">
                             <a href="${pageContext.request.contextPath}/student?action=list" class="btn btn-secondary">
                                 Cancel
                             </a>
