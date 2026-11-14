@@ -5,6 +5,8 @@
 
         <head>
             <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="color-scheme" content="light dark">
             <title>Dashboard - Student Management System</title>
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
         </head>
@@ -26,7 +28,7 @@
             </div>
             <div class="container">
                 <div class="welcome-card">
-                    <h1>${welcomeMessage}</h1>
+                    <h1>${not empty welcomeMessage ? welcomeMessage : 'Welcome back, '.concat(sessionScope.fullName).concat('!')}</h1>
                     <p>You are signed in as <strong>${sessionScope.role}</strong>.</p>
                 </div>
                 <div class="stats-row">

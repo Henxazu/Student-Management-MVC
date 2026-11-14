@@ -30,7 +30,8 @@ public class AuthFilter implements Filter {
     // Paths that must be accessible without a session
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
             "/login",
-            "/logout");
+            "/logout",
+            "/theme");
 
     // File extensions that must never require authentication
     private static final List<String> PUBLIC_EXTENSIONS = Arrays.asList(

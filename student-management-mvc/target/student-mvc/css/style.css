@@ -74,29 +74,6 @@
     box-sizing: border-box;
 }
 
-body.dark-theme {
-    background: #0f172a;
-    color: #f8fafc;
-}
-
-body.dark-theme .welcome-card,
-body.dark-theme .stat-card,
-body.dark-theme .actions-card {
-    background: #1e293b;
-    color: #f8fafc;
-}
-
-body.dark-theme .welcome-card h1,
-body.dark-theme .stat-card .number,
-body.dark-theme .actions-card h2 {
-    color: #f8fafc;
-}
-
-body.dark-theme .welcome-card p,
-body.dark-theme .stat-card .label {
-    color: #94a3b8;
-}
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f0f2f5;
@@ -115,6 +92,32 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+/* Dark Theme Overrides for dashboard.jsp */
+body.dark-theme {
+    background: #0f172a;
+    color: #f8fafc;
+}
+body.dark-theme .navbar {
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+}
+body.dark-theme .welcome-card,
+body.dark-theme .stat-card,
+body.dark-theme .actions-card {
+    background: #1e293b;
+    color: #f8fafc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+body.dark-theme .welcome-card h1,
+body.dark-theme .stat-card .number,
+body.dark-theme .actions-card h2 {
+    color: #f8fafc;
+}
+body.dark-theme .welcome-card p,
+body.dark-theme .stat-card .label {
+    color: #94a3b8;
 }
 
 /* ==========================================================================

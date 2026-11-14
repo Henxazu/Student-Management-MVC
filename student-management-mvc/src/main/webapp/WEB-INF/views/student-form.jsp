@@ -6,6 +6,7 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="color-scheme" content="light dark">
             <title>${student != null ? 'Edit Student' : 'Enroll New Student'} - EduManage</title>
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +15,11 @@
             <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
         </head>
 
-        <body>
+        <body class="${cookie.user_theme.value eq 'dark' ? 'dark-theme' : ''}">
             <!-- Top Navigation -->
             <nav class="navbar">
                 <div class="nav-container">
-                    <a href="${pageContext.request.contextPath}/index.jsp" class="nav-brand">
+                    <a href="${pageContext.request.contextPath}/dashboard" class="nav-brand">
                         <span class="nav-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
                         <span>EduManage</span>
                     </a>
@@ -28,10 +29,12 @@
                         <li><a href="${pageContext.request.contextPath}/student?action=new"
                                 class="nav-link ${student == null ? 'active' : ''}"><i class="bi bi-person-plus"></i>
                                 Add Student</a></li>
-                        <li><a href="${pageContext.request.contextPath}/student?action=dashboard" class="nav-link"><i
+                        <li><a href="${pageContext.request.contextPath}/dashboard" class="nav-link"><i
                                     class="bi bi-pie-chart"></i> Dashboard</a></li>
                         <li><a href="${pageContext.request.contextPath}/student?action=export&format=csv"
                                 class="nav-link"><i class="bi bi-file-earmark-spreadsheet"></i> Export</a></li>
+                        <li><a href="${pageContext.request.contextPath}/theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}"
+                                class="nav-link">${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}</a></li>
                     </ul>
                 </div>
             </nav>

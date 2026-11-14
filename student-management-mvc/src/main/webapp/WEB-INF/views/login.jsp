@@ -6,8 +6,21 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="color-scheme" content="light dark">
             <title>Login - Student Management System</title>
             <style>
+                :root {
+                    color-scheme: light dark;
+                }
+
+                :root:has(body:not(.dark-theme)) {
+                    color-scheme: light;
+                }
+
+                :root:has(body.dark-theme) {
+                    color-scheme: dark;
+                }
+
                 * {
                     margin: 0;
                     padding: 0;
@@ -133,11 +146,91 @@
                     margin-bottom: 6px;
                     color: #333;
                 }
+
+                .theme-toggle-row {
+                    display: flex;
+                    justify-content: flex-end;
+                    margin-bottom: 8px;
+                }
+
+                .theme-toggle-link {
+                    text-decoration: none;
+                    font-size: 13px;
+                    font-weight: 600;
+                    padding: 5px 10px;
+                    border-radius: 6px;
+                    color: #2c3e50;
+                    background: #f1f5f9;
+                    border: 1px solid #cbd5e1;
+                    transition: background 0.2s;
+                }
+
+                .theme-toggle-link:hover {
+                    background: #e2e8f0;
+                }
+
+                body.dark-theme {
+                    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .card {
+                    background: #1e293b;
+                    color: #f8fafc;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+                    border: 1px solid #334155;
+                }
+
+                body.dark-theme h1,
+                body.dark-theme label {
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .subtitle,
+                body.dark-theme .remember-row {
+                    color: #94a3b8;
+                }
+
+                body.dark-theme input[type="text"],
+                body.dark-theme input[type="password"] {
+                    background: #0f172a;
+                    color: #f8fafc;
+                    border-color: #334155;
+                }
+
+                body.dark-theme input:focus {
+                    border-color: #3498db;
+                }
+
+                body.dark-theme .demo-box {
+                    background: #0f172a;
+                    color: #94a3b8;
+                    border: 1px solid #334155;
+                }
+
+                body.dark-theme .demo-box strong {
+                    color: #f8fafc;
+                }
+
+                body.dark-theme .theme-toggle-link {
+                    color: #f8fafc;
+                    background: #0f172a;
+                    border-color: #334155;
+                }
+
+                body.dark-theme .theme-toggle-link:hover {
+                    background: #334155;
+                }
             </style>
         </head>
 
-        <body>
+        <body class="${cookie.user_theme.value eq 'dark' ? 'dark-theme' : ''}">
             <div class="card">
+                <div class="theme-toggle-row">
+                    <a href="theme?mode=${cookie.user_theme.value eq 'dark' ? 'light' : 'dark'}" class="theme-toggle-link">
+                        ${cookie.user_theme.value eq 'dark' ? '☀️ Light' : '🌙 Dark'}
+                    </a>
+                </div>
                 <h1>Login</h1>
                 <p class="subtitle">Student Management System</p>
                 <%-- Error from failed login attempt --%>
